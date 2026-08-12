@@ -1,0 +1,10 @@
+packages:
+  - packages/*
+  - integrations/*
+  - apps/*
+
+allowBuilds:
+  esbuild: true
+  workerd: true
+
+minimumReleaseAge: 1440

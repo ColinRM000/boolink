@@ -1,0 +1,29 @@
+{
+  "name": "@boolink/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BooLink public discovery website.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "deploy": "wrangler pages deploy dist --project-name boolink --branch main",
+    "dev": "vite",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "wrangler:check": "wrangler pages deployment list --project-name boolink"
+  },
+  "dependencies": {
+    "lucide-react": "1.31.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@vitejs/plugin-react": "6.0.5",
+    "vite": "8.2.1",
+    "wrangler": "4.120.0"
+  }
+}

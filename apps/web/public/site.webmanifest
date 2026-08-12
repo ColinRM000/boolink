@@ -1,0 +1,17 @@
+{
+  "name": "BooLink",
+  "short_name": "BooLink",
+  "description": "Open-source, local-first MCP integrations for AI agents.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070914",
+  "theme_color": "#070914",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "256x256",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ]
+}

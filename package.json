@@ -1,0 +1,38 @@
+{
+  "name": "@boolink/monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Open-source, local-first MCP integrations for AI agents.",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@11.16.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm -r --if-present build",
+    "check": "pnpm format:check && pnpm lint && pnpm build && pnpm typecheck && pnpm test",
+    "clean": "pnpm -r --if-present clean",
+    "deploy:web": "pnpm --filter @boolink/web deploy",
+    "dev:web": "pnpm --filter @boolink/web dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "release:pack": "pnpm check && node scripts/pack-release.mjs",
+    "security:audit": "pnpm audit --audit-level=high",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "pnpm -r --if-present typecheck"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@modelcontextprotocol/client": "2.0.0",
+    "@types/node": "22.20.1",
+    "eslint": "10.8.1",
+    "prettier": "3.9.6",
+    "tsx": "4.23.12",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.67.0",
+    "vitest": "4.1.10"
+  }
+}

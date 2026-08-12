@@ -1,0 +1,45 @@
+{
+  "name": "@boolink/core",
+  "version": "0.1.0",
+  "description": "Protocol-independent contracts for BooLink integrations.",
+  "license": "MIT",
+  "homepage": "https://boolink.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ColinRM000/boolink.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/ColinRM000/boolink/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "prepack": "pnpm build",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "zod": "4.4.3"
+  }
+}

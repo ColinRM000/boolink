@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-12T00:00:00.000Z",
+  "integrations": [
+    {
+      "schemaVersion": 1,
+      "id": "github",
+      "name": "GitHub",
+      "description": "Connect AI agents to GitHub repositories, issues, and pull requests through a local MCP server.",
+      "version": "0.1.0",
+      "provider": "GitHub",
+      "category": "development",
+      "packageName": "@boolink/github",
+      "repositoryUrl": "https://github.com/ColinRM000/boolink",
+      "documentationUrl": "https://boolink.dev/integrations/github",
+      "verification": "experimental",
+      "authentication": {
+        "type": "bearer-token",
+        "instructionsUrl": "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens",
+        "requirements": [
+          {
+            "id": "token",
+            "label": "GitHub token",
+            "description": "A fine-grained personal access token with read access only to the repositories and capabilities you intend to expose.",
+            "source": "environment",
+            "environmentVariables": ["GITHUB_TOKEN"],
+            "required": true
+          }
+        ]
+      },
+      "transports": ["stdio"],
+      "tools": [
+        {
+          "name": "github.get_authenticated_user",
+          "title": "Get authenticated GitHub user",
+          "description": "Returns the GitHub account associated with the locally configured token. Use it to confirm which identity BooLink will act as. It has no side effects and accepts no inputs.",
+          "capabilities": ["read"],
+          "destructive": false,
+          "idempotent": true,
+          "requiredScopes": []
+        },
+        {
+          "name": "github.search_issues",
+          "title": "Search GitHub issues",
+          "description": "Searches GitHub issues using GitHub search syntax. Use it to find issues across repositories visible to the configured token. Results exclude pull requests, are paginated, and this tool has no side effects. The query is required.",
+          "capabilities": ["read"],
+          "destructive": false,
+          "idempotent": true,
+          "requiredScopes": ["Issues: read for private repositories"]
+        },
+        {
+          "name": "github.get_issue",
+          "title": "Get a GitHub issue",
+          "description": "Returns one issue by repository and number. Use it when an exact issue is known and full issue details are needed. GitHub may identify a pull request through this endpoint; the result marks that case. It has no side effects.",
+          "capabilities": ["read"],
+          "destructive": false,
+          "idempotent": true,
+          "requiredScopes": ["Issues: read for private repositories"]
+        },
+        {
+          "name": "github.list_pull_requests",
+          "title": "List GitHub pull requests",
+          "description": "Lists pull requests in one repository with state, branch, sort, and pagination filters. Use it to inspect repository collaboration activity. It has no side effects; owner and repository are required.",
+          "capabilities": ["read"],
+          "destructive": false,
+          "idempotent": true,
+          "requiredScopes": ["Pull requests: read for private repositories"]
+        }
+      ]
+    }
+  ]
+}
