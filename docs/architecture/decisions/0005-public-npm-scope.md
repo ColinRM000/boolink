@@ -1,6 +1,6 @@
 # ADR 0005: Public npm scope
 
-- Status: Accepted
+- Status: Superseded by ADR 0006
 - Date: 2026-08-12
 
 ## Context

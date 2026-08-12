@@ -1,4 +1,4 @@
-# `boolink`
+# `@boolink-dev/cli`
 
 Experimental local-first CLI for discovering, inspecting, installing, configuring, and diagnosing
 BooLink integrations.
@@ -18,16 +18,16 @@ keys to browse, `/` to search, and Enter to inspect an integration. The install 
 capabilities, credential presence, affected files, and client choice before accepting `Y` as final
 approval. It never displays credential values.
 
-After the first npm release, users will be able to launch the shop without a global install:
+Launch the shop without a global install:
 
 ```bash
-npx boolink
+npx @boolink-dev/cli
 ```
 
-The package is not published yet. Until then, build and run it from this repository:
+To build and run it from this repository instead:
 
 ```bash
-pnpm --filter boolink build
+pnpm --filter @boolink-dev/cli build
 node packages/cli/dist/bin.js search github
 ```
 
@@ -61,7 +61,7 @@ including for isolated tests.
 
 ## Current limitations
 
-- npm publication is prepared and locally validated, but has not happened yet.
+- The CLI is experimental and its public API may change before 1.0.
 - GitHub is the only catalog entry and server package.
 - The Codex adapter and neutral JSON output are the first supported client paths.
 - `doctor` performs local diagnostics only. It does not call GitHub or send telemetry.

@@ -30,7 +30,7 @@ const packages = [
   },
   {
     directory: 'packages/cli',
-    name: 'boolink',
+    name: '@boolink-dev/cli',
     required: ['package/dist/index.js', 'package/dist/bin.js'],
   },
 ];
@@ -110,8 +110,8 @@ for (const tarball of tarballs) {
   packedByName.set(manifest.name, tarball);
 }
 
-const cliTarball = packedByName.get('boolink');
-if (!cliTarball) throw new Error('The boolink CLI tarball was not created.');
+const cliTarball = packedByName.get('@boolink-dev/cli');
+if (!cliTarball) throw new Error('The @boolink-dev/cli tarball was not created.');
 const cliManifest = JSON.parse(await tarText(cliTarball, 'package/package.json'));
 for (const executableName of ['boolink', 'boo']) {
   if (cliManifest.bin?.[executableName] !== './dist/bin.js') {

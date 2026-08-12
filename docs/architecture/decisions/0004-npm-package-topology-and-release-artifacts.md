@@ -1,6 +1,6 @@
 # ADR 0004: npm package topology and validated release artifacts
 
-- Status: Accepted
+- Status: Superseded by ADR 0006
 - Date: 2026-08-12
 
 ## Context

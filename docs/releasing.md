@@ -1,12 +1,12 @@
 # BooLink release runbook
 
-Public npm publication is not active yet. This runbook separates reproducible package validation
-from the external actions that claim package names and make a release public.
+This runbook separates reproducible package validation from the external actions that make a
+release public.
 
 ## Prerequisites
 
 1. Create the public BooLink source repository and push a reviewed commit.
-2. Confirm ownership of the unscoped `boolink` package and the `@boolink` npm organization.
+2. Confirm ownership of the `@boolink-dev` npm organization and all intended scoped names.
 3. Configure npm trusted publishing from the release repository so packages carry provenance.
 4. Keep npm credentials in the publisher or CI secret store; never place them in this repository.
 5. Ensure the release commit passes `pnpm check`.
@@ -32,12 +32,12 @@ Publish packages only from the validated tarballs, in dependency order:
 2. `@boolink-dev/sdk`
 3. `@boolink-dev/registry`
 4. `@boolink-dev/github`
-5. `boolink`
+5. `@boolink-dev/cli`
 
 Use the tarball filenames recorded in `release/release-manifest.json`; scoped package tarball names
 do not preserve the scope text. Never select an artifact by a loose filename pattern.
 
-After publication, verify `npx boolink` in a clean environment, attach checksums to the matching
+After publication, verify `npx @boolink-dev/cli` in a clean environment, attach checksums to the matching
 source release, and update the website only after the install path succeeds publicly.
 
 ## Failure handling

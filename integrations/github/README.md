@@ -45,9 +45,15 @@ export GITHUB_TOKEN="your-token"
 The value is read from `GITHUB_TOKEN`. It is not accepted through MCP tool inputs, written to a
 file, included in the manifest, or returned to the model.
 
-## Build and run
+## Run
 
-The package is not published yet. From this repository:
+The recommended path is through the BooLink CLI:
+
+```bash
+npx @boolink-dev/cli
+```
+
+To build this integration directly from the repository:
 
 ```bash
 pnpm install

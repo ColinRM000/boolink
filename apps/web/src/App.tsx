@@ -491,8 +491,7 @@ export function App() {
                 </div>
                 <pre aria-label="GitHub integration local run commands">
                   <code>
-                    <span>$</span> pnpm --filter boolink build{`\n`}
-                    <span>$</span> node packages/cli/dist/bin.js
+                    <span>$</span> npx @boolink-dev/cli
                   </code>
                 </pre>
               </div>

@@ -9,8 +9,7 @@ maintained MCP servers that connect compatible AI clients to services such as Gi
 Cloudflare without routing user credentials through BooLink infrastructure.
 
 > BooLink is in active development. The experimental GitHub reference integration is implemented
-> in the repository, and the first source-based CLI workflow is available. Packages have not been
-> published or live-verified yet.
+> and the first CLI and package release is available on npm.
 
 ## Principles
 
@@ -44,10 +43,16 @@ pnpm check
 pnpm dev:web
 ```
 
-After building, the experimental CLI can inspect and preview the GitHub setup:
+Launch the experimental CLI from npm:
 
 ```bash
-pnpm --filter boolink build
+npx @boolink-dev/cli
+```
+
+Or build it locally to inspect and preview the GitHub setup:
+
+```bash
+pnpm --filter @boolink-dev/cli build
 node packages/cli/dist/bin.js
 node packages/cli/dist/bin.js search github
 node packages/cli/dist/bin.js add github --client codex
@@ -60,7 +65,7 @@ available at [boolink.dev](https://boolink.dev); see the
 
 ## Release artifacts
 
-The packages are not published yet. Maintainers can build the exact npm tarballs, install them in
+Maintainers can build the exact npm tarballs, install them in
 an isolated temporary project, smoke-test the installed CLI, and generate SHA-256 checksums with:
 
 ```bash
