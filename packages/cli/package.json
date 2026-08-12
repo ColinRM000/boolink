@@ -44,9 +44,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@boolink/core": "workspace:^",
-    "@boolink/github": "workspace:^",
-    "@boolink/registry": "workspace:^",
+    "@boolink-dev/core": "workspace:^",
+    "@boolink-dev/github": "workspace:^",
+    "@boolink-dev/registry": "workspace:^",
     "zod": "4.4.3"
   }
 }

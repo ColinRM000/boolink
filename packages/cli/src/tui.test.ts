@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { bundledRegistry } from '@boolink/registry';
+import { bundledRegistry } from '@boolink-dev/registry';
 import {
   createShopState,
   renderShop,

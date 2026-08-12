@@ -2,8 +2,8 @@ import os from 'node:os';
 import path from 'node:path';
 import readline from 'node:readline';
 
-import type { IntegrationManifest } from '@boolink/core';
-import { bundledRegistry, searchRegistry, type RegistryDocument } from '@boolink/registry';
+import type { IntegrationManifest } from '@boolink-dev/core';
+import { bundledRegistry, searchRegistry, type RegistryDocument } from '@boolink-dev/registry';
 
 export type ShopScreen = 'catalog' | 'details' | 'client' | 'confirm';
 export type ShopClient = 'codex' | 'none';

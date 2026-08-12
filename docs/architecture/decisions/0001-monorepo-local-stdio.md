@@ -10,8 +10,8 @@ and a strict local credential boundary. MCP supports both local stdio and remote
 
 ## Decision
 
-Use a pnpm TypeScript monorepo. Keep protocol-neutral contracts in `@boolink/core`, MCP adaptation
-in `@boolink/sdk`, and catalog data in `@boolink/registry`. Official integrations are independent
+Use a pnpm TypeScript monorepo. Keep protocol-neutral contracts in `@boolink-dev/core`, MCP adaptation
+in `@boolink-dev/sdk`, and catalog data in `@boolink-dev/registry`. Official integrations are independent
 workspace packages. Their default executable transport is stdio, served through the official MCP
 SDK v2 `serveStdio` entry so modern and supported legacy protocol eras can negotiate correctly.
 

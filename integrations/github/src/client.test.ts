@@ -1,4 +1,4 @@
-import { BooLinkError } from '@boolink/core';
+import { BooLinkError } from '@boolink-dev/core';
 import { describe, expect, it } from 'vitest';
 
 import { createGitHubClient, GITHUB_API_VERSION, type GitHubFetch } from './client.js';

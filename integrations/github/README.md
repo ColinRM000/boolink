@@ -1,4 +1,4 @@
-# `@boolink/github`
+# `@boolink-dev/github`
 
 Experimental, local-first GitHub integration for BooLink. It runs as an MCP server in the user's
 environment and communicates directly with GitHub's REST API. BooLink infrastructure does not
@@ -51,7 +51,7 @@ The package is not published yet. From this repository:
 
 ```bash
 pnpm install
-pnpm --filter @boolink/github build
+pnpm --filter @boolink-dev/github build
 node integrations/github/dist/server.js
 ```
 

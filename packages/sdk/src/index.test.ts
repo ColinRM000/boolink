@@ -12,7 +12,7 @@ import {
   defineTool,
   type IntegrationManifest,
   type ToolMetadata,
-} from '@boolink/core';
+} from '@boolink-dev/core';
 
 const closeables: Array<{ close: () => Promise<void> }> = [];
 
@@ -90,7 +90,7 @@ describe('BooLink MCP adapter', () => {
       ...echoIntegration.manifest,
       id: 'failure',
       name: 'Failure fixture',
-      packageName: '@boolink/failure',
+      packageName: '@boolink-dev/failure',
       tools: [errorMetadata],
     };
     const integration = defineIntegration({

@@ -6,8 +6,8 @@ is ready for third-party publication yet; use this while building the first refe
 ## Package boundary
 
 Create one package under `integrations/<id>`. It owns its manifest, local configuration loader,
-provider client, tools, entry point, tests, and documentation. It may depend on `@boolink/core` and
-`@boolink/sdk`, but never on another integration.
+provider client, tools, entry point, tests, and documentation. It may depend on `@boolink-dev/core`
+and `@boolink-dev/sdk`, but never on another integration.
 
 Keep the provider client transport-independent and accept an injectable `fetch` implementation so
 request construction, pagination, and failure behavior can be verified without live credentials.
@@ -28,7 +28,7 @@ wrapper around an HTTP endpoint. Its description must tell the model what it doe
 important limitations, required inputs, and side effects.
 
 Each tool declares capability classes, destructive behavior, idempotency, and provider scopes.
-`@boolink/sdk` maps common behavior to MCP annotations and preserves BooLink-specific metadata under
+`@boolink-dev/sdk` maps common behavior to MCP annotations and preserves BooLink-specific metadata under
 `io.boolink/tool`.
 
 Use `defineTool` with a strict Zod input schema. Return concise text for model consumption and

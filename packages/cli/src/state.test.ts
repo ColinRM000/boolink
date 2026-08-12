@@ -17,7 +17,7 @@ describe('installation state', () => {
       integrations: [
         {
           id: 'github',
-          packageName: '@boolink/github',
+          packageName: '@boolink-dev/github',
           version: '0.1.0',
           installedAt: '2026-08-12T12:00:00.000Z',
           command: 'node',

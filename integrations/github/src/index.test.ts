@@ -1,7 +1,7 @@
 import { Client, InMemoryTransport } from '@modelcontextprotocol/client';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { createBooLinkServer } from '@boolink/sdk';
+import { createBooLinkServer } from '@boolink-dev/sdk';
 import { createGitHubClient, type GitHubFetch } from './client.js';
 import { createGitHubIntegration, githubManifest } from './index.js';
 

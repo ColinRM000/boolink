@@ -1,4 +1,4 @@
-# `@boolink/core`
+# `@boolink-dev/core`
 
 Host-neutral contracts for BooLink integrations. This package defines integration manifests, tool
 metadata, capability classes, and normalized errors without depending on the MCP SDK.

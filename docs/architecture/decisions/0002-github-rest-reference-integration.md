@@ -7,7 +7,7 @@
 
 GitHub is BooLink's first real integration and must validate local authentication, request
 construction, pagination, provider error handling, capability metadata, and MCP execution without
-forcing provider details into `@boolink/core` or `@boolink/sdk`.
+forcing provider details into `@boolink-dev/core` or `@boolink-dev/sdk`.
 
 GitHub exposes REST and GraphQL APIs. Its REST API is versioned and the current official version is
 `2026-03-10`. The first useful tool set maps naturally to stable REST resources and needs only

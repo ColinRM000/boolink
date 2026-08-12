@@ -14,8 +14,9 @@ exist before a trustworthy public release.
 
 Publish the user-facing CLI as the unscoped `boolink` package with the `boo` executable. This makes
 `npx boolink` the zero-install path into the interactive integration shop. Publish implementation
-packages under the `@boolink` scope: `@boolink/core`, `@boolink/sdk`, `@boolink/registry`, and
-independently versioned integration packages such as `@boolink/github`.
+packages under the `@boolink-dev` scope: `@boolink-dev/core`, `@boolink-dev/sdk`,
+`@boolink-dev/registry`, and independently versioned integration packages such as
+`@boolink-dev/github`.
 
 Begin the public package line at `0.1.0`. Use exact workspace relationships while developing, then
 have the package manager rewrite them to compatible published ranges during packing. Before any
@@ -29,7 +30,7 @@ names or publish externally.
 
 ## Alternatives considered
 
-- Keep the CLI named `@boolink/cli`: rejected because it makes the first-run command longer and less
+- Keep the CLI named `@boolink-dev/cli`: rejected because it makes the first-run command longer and less
   memorable without adding a meaningful trust boundary.
 - Bundle every integration into one package: rejected because integrations must remain independently
   versioned and users should not download providers they do not use.

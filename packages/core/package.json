@@ -1,5 +1,5 @@
 {
-  "name": "@boolink/core",
+  "name": "@boolink-dev/core",
   "version": "0.1.0",
   "description": "Protocol-independent contracts for BooLink integrations.",
   "license": "MIT",

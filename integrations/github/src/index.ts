@@ -4,7 +4,7 @@ import {
   type IntegrationManifest,
   type ToolMetadata,
   type ToolResult,
-} from '@boolink/core';
+} from '@boolink-dev/core';
 import * as z from 'zod/v4';
 
 import type { GitHubClient } from './client.js';
@@ -96,7 +96,7 @@ export const githubManifest: IntegrationManifest = {
   version: '0.1.0',
   provider: 'GitHub',
   category: 'development',
-  packageName: '@boolink/github',
+  packageName: '@boolink-dev/github',
   repositoryUrl: 'https://github.com/ColinRM000/boolink',
   documentationUrl: 'https://boolink.dev/integrations/github',
   verification: 'experimental',

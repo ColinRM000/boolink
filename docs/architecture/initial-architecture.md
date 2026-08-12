@@ -13,20 +13,20 @@ Provider API client (integration-owned)
               v
 Integration definition + handlers
               |
-      @boolink/core contracts
+      @boolink-dev/core contracts
               |
               v
-       @boolink/sdk adapter
+       @boolink-dev/sdk adapter
               |
               v
  Official MCP SDK / local stdio
 ```
 
-- `@boolink/core` owns manifest, authentication, capability, tool, and normalized-error contracts.
+- `@boolink-dev/core` owns manifest, authentication, capability, tool, and normalized-error contracts.
   It knows nothing about MCP transports.
-- `@boolink/sdk` adapts a validated BooLink integration definition to an MCP server and owns safe
+- `@boolink-dev/sdk` adapts a validated BooLink integration definition to an MCP server and owns safe
   error conversion. It does not call provider APIs.
-- `@boolink/registry` validates registry documents and provides deterministic discovery helpers. It
+- `@boolink-dev/registry` validates registry documents and provides deterministic discovery helpers. It
   contains metadata, never executable integration code.
 - Each package under `integrations/` will own provider authentication loading, the API client,
   mapping, tools, tests, and documentation.

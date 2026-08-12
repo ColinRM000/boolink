@@ -28,7 +28,7 @@ const manifest: IntegrationManifest = {
   version: '0.1.0',
   provider: 'GitHub',
   category: 'development',
-  packageName: '@boolink/github',
+  packageName: '@boolink-dev/github',
   repositoryUrl: 'https://github.com/boolink/boolink',
   documentationUrl: 'https://boolink.dev/integrations/github',
   verification: 'experimental',
@@ -52,6 +52,10 @@ const manifest: IntegrationManifest = {
 describe('integration contracts', () => {
   it('accepts a valid manifest and rejects credential values', () => {
     expect(integrationManifestSchema.parse(manifest)).toEqual(manifest);
+
+    expect(() =>
+      integrationManifestSchema.parse({ ...manifest, packageName: '@boolink/github' }),
+    ).toThrow(/boolink-dev/);
 
     const withSecretValue = structuredClone(manifest) as unknown as Record<string, unknown>;
     const authentication = withSecretValue.authentication as Record<string, unknown>;

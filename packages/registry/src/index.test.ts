@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { githubManifest } from '@boolink/github';
+import { githubManifest } from '@boolink-dev/github';
 import { bundledRegistry, createRegistry, parseRegistry, searchRegistry } from './index.js';
-import type { IntegrationManifest } from '@boolink/core';
+import type { IntegrationManifest } from '@boolink-dev/core';
 
 function manifest(id: string, name: string, category: string): IntegrationManifest {
   return {
@@ -13,7 +13,7 @@ function manifest(id: string, name: string, category: string): IntegrationManife
     version: '0.1.0',
     provider: name,
     category,
-    packageName: `@boolink/${id}`,
+    packageName: `@boolink-dev/${id}`,
     repositoryUrl: `https://github.com/boolink/${id}`,
     documentationUrl: `https://boolink.dev/integrations/${id}`,
     verification: 'experimental',

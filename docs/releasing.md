@@ -22,17 +22,20 @@ pnpm release:pack
 
 `release:pack` runs the full repository checks, builds five npm tarballs in `release/`, validates
 their manifests and required files, installs the packed graph in a temporary project, exercises the
-installed CLI, and writes `release/SHA256SUMS.txt`.
+installed CLI, and writes `release/SHA256SUMS.txt` plus `release/release-manifest.json`.
 
 ## Publication order
 
 Publish packages only from the validated tarballs, in dependency order:
 
-1. `@boolink/core`
-2. `@boolink/sdk`
-3. `@boolink/registry`
-4. `@boolink/github`
+1. `@boolink-dev/core`
+2. `@boolink-dev/sdk`
+3. `@boolink-dev/registry`
+4. `@boolink-dev/github`
 5. `boolink`
+
+Use the tarball filenames recorded in `release/release-manifest.json`; scoped package tarball names
+do not preserve the scope text. Never select an artifact by a loose filename pattern.
 
 After publication, verify `npx boolink` in a clean environment, attach checksums to the matching
 source release, and update the website only after the install path succeeds publicly.

@@ -5,7 +5,7 @@ import {
   type BooLinkTool,
   type IntegrationDefinition,
   type ToolResult,
-} from '@boolink/core';
+} from '@boolink-dev/core';
 import { McpServer, type CallToolResult } from '@modelcontextprotocol/server';
 import { serveStdio } from '@modelcontextprotocol/server/stdio';
 

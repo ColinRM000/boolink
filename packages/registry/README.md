@@ -1,4 +1,4 @@
-# `@boolink/registry`
+# `@boolink-dev/registry`
 
 The machine-readable BooLink integration catalog and its runtime-validated query helpers.
 

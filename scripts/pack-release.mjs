@@ -16,16 +16,16 @@ if (!outputDirectory.startsWith(allowedPrefix) || outputDirectory === repository
 }
 
 const packages = [
-  { directory: 'packages/core', name: '@boolink/core', required: ['package/dist/index.js'] },
-  { directory: 'packages/sdk', name: '@boolink/sdk', required: ['package/dist/index.js'] },
+  { directory: 'packages/core', name: '@boolink-dev/core', required: ['package/dist/index.js'] },
+  { directory: 'packages/sdk', name: '@boolink-dev/sdk', required: ['package/dist/index.js'] },
   {
     directory: 'packages/registry',
-    name: '@boolink/registry',
+    name: '@boolink-dev/registry',
     required: ['package/dist/index.js', 'package/src/catalog.json'],
   },
   {
     directory: 'integrations/github',
-    name: '@boolink/github',
+    name: '@boolink-dev/github',
     required: ['package/dist/index.js', 'package/dist/server.js'],
   },
   {
@@ -182,6 +182,18 @@ for (const tarball of tarballs) {
 await writeFile(
   path.join(outputDirectory, 'SHA256SUMS.txt'),
   `${checksumLines.join('\n')}\n`,
+  'utf8',
+);
+
+const releaseManifest = {
+  version: '0.1.0',
+  packages: Object.fromEntries(
+    [...packedByName.entries()].map(([name, tarball]) => [name, path.basename(tarball)]),
+  ),
+};
+await writeFile(
+  path.join(outputDirectory, 'release-manifest.json'),
+  `${JSON.stringify(releaseManifest, null, 2)}\n`,
   'utf8',
 );
 

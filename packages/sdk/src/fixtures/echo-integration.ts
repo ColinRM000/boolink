@@ -3,7 +3,7 @@ import {
   defineTool,
   type IntegrationManifest,
   type ToolMetadata,
-} from '@boolink/core';
+} from '@boolink-dev/core';
 import * as z from 'zod/v4';
 
 const echoMetadata: ToolMetadata = {
@@ -24,7 +24,7 @@ const manifest: IntegrationManifest = {
   version: '0.0.0',
   provider: 'BooLink',
   category: 'development',
-  packageName: '@boolink/echo',
+  packageName: '@boolink-dev/echo',
   repositoryUrl: 'https://github.com/boolink/boolink',
   documentationUrl: 'https://boolink.dev/docs/testing',
   verification: 'experimental',

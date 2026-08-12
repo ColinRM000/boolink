@@ -1,5 +1,5 @@
 {
-  "name": "@boolink/github",
+  "name": "@boolink-dev/github",
   "version": "0.1.0",
   "description": "Local-first GitHub MCP integration for BooLink.",
   "license": "MIT",
@@ -44,8 +44,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@boolink/core": "workspace:^",
-    "@boolink/sdk": "workspace:^",
+    "@boolink-dev/core": "workspace:^",
+    "@boolink-dev/sdk": "workspace:^",
     "zod": "4.4.3"
   },
   "devDependencies": {

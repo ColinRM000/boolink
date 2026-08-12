@@ -1,4 +1,4 @@
-import { integrationManifestSchema, type IntegrationManifest } from '@boolink/core';
+import { integrationManifestSchema, type IntegrationManifest } from '@boolink-dev/core';
 import * as z from 'zod/v4';
 
 import catalogDocument from './catalog.json' with { type: 'json' };

@@ -3,8 +3,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { redactSensitiveText, type IntegrationManifest } from '@boolink/core';
-import { bundledRegistry, searchRegistry, type RegistryDocument } from '@boolink/registry';
+import { redactSensitiveText, type IntegrationManifest } from '@boolink-dev/core';
+import { bundledRegistry, searchRegistry, type RegistryDocument } from '@boolink-dev/registry';
 
 import {
   planClientConfiguration,
@@ -119,7 +119,7 @@ function parseAddOptions(args: string[]): AddOptions {
 
 async function defaultServerResolver(integrationId: string): Promise<string> {
   if (integrationId !== 'github') throw new Error('No local server package is available.');
-  return fileURLToPath(import.meta.resolve('@boolink/github/server'));
+  return fileURLToPath(import.meta.resolve('@boolink-dev/github/server'));
 }
 
 function resolveOutputPath(

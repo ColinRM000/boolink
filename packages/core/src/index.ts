@@ -1,6 +1,6 @@
 import * as z from 'zod/v4';
 
-const PACKAGE_NAME_PATTERN = /^@boolink\/[a-z][a-z0-9-]*$/;
+const PACKAGE_NAME_PATTERN = /^@boolink-dev\/[a-z][a-z0-9-]*$/;
 const INTEGRATION_ID_PATTERN = /^[a-z][a-z0-9-]*$/;
 const TOOL_NAME_PATTERN = /^[a-z][a-z0-9-]*\.[a-z][a-z0-9_]*$/;
 const SEMVER_PATTERN =

@@ -1,4 +1,4 @@
-import { BooLinkError } from '@boolink/core';
+import { BooLinkError } from '@boolink-dev/core';
 import type * as z from 'zod/v4';
 
 import {

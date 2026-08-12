@@ -1,4 +1,4 @@
-# `@boolink/sdk`
+# `@boolink-dev/sdk`
 
 The BooLink adapter for exposing validated integration definitions through the official Model
 Context Protocol SDK.

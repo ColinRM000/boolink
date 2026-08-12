@@ -66,10 +66,10 @@ importers:
 
   integrations/github:
     dependencies:
-      '@boolink/core':
+      '@boolink-dev/core':
         specifier: workspace:^
         version: link:../../packages/core
-      '@boolink/sdk':
+      '@boolink-dev/sdk':
         specifier: workspace:^
         version: link:../../packages/sdk
       zod:
@@ -82,13 +82,13 @@ importers:
 
   packages/cli:
     dependencies:
-      '@boolink/core':
+      '@boolink-dev/core':
         specifier: workspace:^
         version: link:../core
-      '@boolink/github':
+      '@boolink-dev/github':
         specifier: workspace:^
         version: link:../../integrations/github
-      '@boolink/registry':
+      '@boolink-dev/registry':
         specifier: workspace:^
         version: link:../registry
       zod:
@@ -103,20 +103,20 @@ importers:
 
   packages/registry:
     dependencies:
-      '@boolink/core':
+      '@boolink-dev/core':
         specifier: workspace:^
         version: link:../core
       zod:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
-      '@boolink/github':
+      '@boolink-dev/github':
         specifier: workspace:^
         version: link:../../integrations/github
 
   packages/sdk:
     dependencies:
-      '@boolink/core':
+      '@boolink-dev/core':
         specifier: workspace:^
         version: link:../core
       '@modelcontextprotocol/server':

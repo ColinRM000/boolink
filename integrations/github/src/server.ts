@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { serveIntegrationStdio } from '@boolink/sdk';
+import { serveIntegrationStdio } from '@boolink-dev/sdk';
 
 import { loadGitHubToken } from './auth.js';
 import { createGitHubClient } from './client.js';
