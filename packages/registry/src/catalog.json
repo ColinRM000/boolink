@@ -7,7 +7,7 @@
       "id": "github",
       "name": "GitHub",
       "description": "Connect AI agents to GitHub repositories, issues, and pull requests through a local MCP server.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "provider": "GitHub",
       "category": "development",
       "packageName": "@boolink-dev/github",
@@ -21,7 +21,7 @@
           {
             "id": "token",
             "label": "GitHub token",
-            "description": "A fine-grained personal access token with read access only to the repositories and capabilities you intend to expose.",
+            "description": "A fine-grained personal access token limited to the repositories and read or write capabilities you explicitly intend to expose.",
             "source": "environment",
             "environmentVariables": ["GITHUB_TOKEN"],
             "required": true
@@ -58,6 +58,44 @@
           "requiredScopes": ["Issues: read for private repositories"]
         },
         {
+          "name": "github.list_issue_comments",
+          "title": "List GitHub issue or pull request comments",
+          "description": "Lists timeline comments on one GitHub issue or pull request. Use it to read the public conversation before replying or changing the item. Results are paginated, it has no side effects, and owner, repository, and issue number are required.",
+          "capabilities": ["read"],
+          "destructive": false,
+          "idempotent": true,
+          "requiredScopes": [
+            "Issues: read for private issues or Pull requests: read for private pull requests"
+          ]
+        },
+        {
+          "name": "github.create_issue",
+          "title": "Create a GitHub issue",
+          "description": "Creates a new issue and triggers GitHub notifications. Use it only when the user intends to publish a new repository issue and has reviewed the title, body, labels, and assignees. This has an external communication side effect, requires owner, repository, and title, and cannot be automatically deduplicated.",
+          "capabilities": ["create", "communication"],
+          "destructive": false,
+          "idempotent": false,
+          "requiredScopes": ["Issues: write"]
+        },
+        {
+          "name": "github.update_issue",
+          "title": "Update a GitHub issue",
+          "description": "Changes fields on an existing GitHub issue, including its title, body, state, labels, or assignees, and may trigger notifications. Use it only when the user intends to modify that exact issue and has reviewed every supplied field. It can close an issue or replace label and assignee sets, so it is classified as destructive and requires at least one change.",
+          "capabilities": ["modify", "communication"],
+          "destructive": true,
+          "idempotent": true,
+          "requiredScopes": ["Issues: write"]
+        },
+        {
+          "name": "github.add_issue_comment",
+          "title": "Comment on a GitHub issue or pull request",
+          "description": "Publishes a timeline comment on an existing GitHub issue or pull request and triggers notifications. Use it only when the user intends to communicate the exact supplied text publicly to that repository conversation. Owner, repository, issue number, and a non-empty body are required, and repeated calls create duplicate comments.",
+          "capabilities": ["create", "communication"],
+          "destructive": false,
+          "idempotent": false,
+          "requiredScopes": ["Issues: write or Pull requests: write"]
+        },
+        {
           "name": "github.list_pull_requests",
           "title": "List GitHub pull requests",
           "description": "Lists pull requests in one repository with state, branch, sort, and pagination filters. Use it to inspect repository collaboration activity. It has no side effects; owner and repository are required.",
@@ -65,6 +103,24 @@
           "destructive": false,
           "idempotent": true,
           "requiredScopes": ["Pull requests: read for private repositories"]
+        },
+        {
+          "name": "github.get_pull_request",
+          "title": "Get a GitHub pull request",
+          "description": "Returns one pull request by repository and number, including its state, branches, author, draft status, and timestamps. Use it when an exact pull request is known and detailed metadata is needed. It has no side effects and requires owner, repository, and pull request number.",
+          "capabilities": ["read"],
+          "destructive": false,
+          "idempotent": true,
+          "requiredScopes": ["Pull requests: read for private repositories"]
+        },
+        {
+          "name": "github.create_pull_request",
+          "title": "Create a GitHub pull request",
+          "description": "Creates a pull request between existing branches and triggers GitHub notifications. Use it only when commits are already pushed and the user intends to publish the exact title, body, head, base, and draft status. This has an external communication side effect and repeated calls may fail or create duplicate proposals.",
+          "capabilities": ["create", "communication"],
+          "destructive": false,
+          "idempotent": false,
+          "requiredScopes": ["Pull requests: write"]
         }
       ]
     }

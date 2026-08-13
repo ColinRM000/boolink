@@ -32,8 +32,9 @@ request and response mapping code that Octokit could otherwise provide. We will 
 SDK only if real integrations demonstrate that maintenance or compatibility costs outweigh the
 dependency and abstraction cost.
 
-Write operations remain deferred until the read-only path is verified through a supported client.
-This ADR does not establish a universal provider-client abstraction.
+The initial write deferral was resolved by the bounded GitHub MVP surface in ADR 0008 after the
+read-only path was verified through the official MCP client and packaged stdio smoke test. This ADR
+still does not establish a universal provider-client abstraction.
 
 ## Sources
 

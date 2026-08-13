@@ -1011,6 +1011,7 @@ h2 {
   margin: 0;
   padding: 0;
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.45rem;
   list-style: none;
 }
@@ -1034,6 +1035,12 @@ h2 {
   color: #7f8aa6;
   font-size: 0.68rem;
   line-height: 1.45;
+}
+
+@media (max-width: 720px) {
+  .integration-toolbox ul {
+    grid-template-columns: 1fr;
+  }
 }
 
 .integration-quickstart {

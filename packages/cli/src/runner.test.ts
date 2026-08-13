@@ -49,11 +49,12 @@ describe('BooLink CLI', () => {
     const test = await harness();
     expect(await runCli(['search', 'github'], test.context)).toBe(0);
     expect(test.stdout.join('')).toContain('github');
-    expect(test.stdout.join('')).toContain('4 tools');
+    expect(test.stdout.join('')).toContain('10 tools');
 
     test.stdout.length = 0;
     expect(await runCli(['info', 'github'], test.context)).toBe(0);
     expect(test.stdout.join('')).toContain('github.get_issue [read]');
+    expect(test.stdout.join('')).toContain('github.create_issue [create, communication]');
     expect(test.stdout.join('')).toContain('Required environment: GITHUB_TOKEN');
   });
 
