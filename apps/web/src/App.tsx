@@ -509,7 +509,7 @@ export function App() {
             <article className="integration-feature" data-reveal="scale">
               <div className="integration-feature-intro">
                 <div className="integration-card-top">
-                  <span className="integration-icon integration-icon-large">
+                  <span className="provider-logo provider-logo-github provider-logo-featured">
                     <img src="/images/providers/github.png" alt="GitHub" />
                   </span>
                   <span className="status-chip status-experimental">Available · beta</span>
@@ -575,16 +575,20 @@ export function App() {
                 return (
                   <article className="integration-card" key={integration.name}>
                     <div className="integration-card-top">
-                      <span className="integration-icon">
-                        {integration.logo ? (
+                      {integration.logo ? (
+                        <span
+                          className={`provider-logo provider-logo-${integration.name.toLowerCase()}`}
+                        >
                           <img
                             src={integration.logo}
                             alt={integration.logoAlt ?? integration.name}
                           />
-                        ) : Icon ? (
+                        </span>
+                      ) : Icon ? (
+                        <span className="integration-icon">
                           <Icon size={24} aria-hidden="true" />
-                        ) : null}
-                      </span>
+                        </span>
+                      ) : null}
                       <span
                         className={`status-chip status-${integration.status.replaceAll(' ', '-').toLowerCase()}`}
                       >
