@@ -6,11 +6,9 @@ import {
   Check,
   ChevronRight,
   CircleDot,
-  Cloud,
   Code2,
   Copy,
   ExternalLink,
-  GitBranch,
   KeyRound,
   LockKeyhole,
   PackageCheck,
@@ -32,7 +30,9 @@ type Integration = {
   category: string;
   status: 'Available in beta' | 'Coming soon' | 'Community choice';
   auth: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
+  logo?: string;
+  logoAlt?: string;
 };
 
 const githubTools = [
@@ -56,7 +56,8 @@ const integrations: readonly Integration[] = [
     category: 'Development',
     status: 'Available in beta',
     auth: 'Local GITHUB_TOKEN',
-    icon: GitBranch,
+    logo: '/images/providers/github.png',
+    logoAlt: 'GitHub',
   },
   {
     name: 'Cloudflare',
@@ -65,7 +66,8 @@ const integrations: readonly Integration[] = [
     category: 'Infrastructure',
     status: 'Coming soon',
     auth: 'Local API token',
-    icon: Cloud,
+    logo: '/images/providers/cloudflare.png',
+    logoAlt: 'Cloudflare',
   },
   {
     name: 'Your most-wanted integration',
@@ -508,7 +510,7 @@ export function App() {
               <div className="integration-feature-intro">
                 <div className="integration-card-top">
                   <span className="integration-icon integration-icon-large">
-                    <GitBranch size={30} aria-hidden="true" />
+                    <img src="/images/providers/github.png" alt="GitHub" />
                   </span>
                   <span className="status-chip status-experimental">Available · beta</span>
                 </div>
@@ -574,7 +576,14 @@ export function App() {
                   <article className="integration-card" key={integration.name}>
                     <div className="integration-card-top">
                       <span className="integration-icon">
-                        <Icon size={24} aria-hidden="true" />
+                        {integration.logo ? (
+                          <img
+                            src={integration.logo}
+                            alt={integration.logoAlt ?? integration.name}
+                          />
+                        ) : Icon ? (
+                          <Icon size={24} aria-hidden="true" />
+                        ) : null}
                       </span>
                       <span
                         className={`status-chip status-${integration.status.replaceAll(' ', '-').toLowerCase()}`}
