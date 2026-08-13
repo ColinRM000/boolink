@@ -28,12 +28,16 @@ type Integration = {
   name: string;
   description: string;
   category: string;
-  status: 'Available in beta' | 'Coming soon' | 'Community choice';
+  status: 'Available' | 'Coming soon' | 'Community choice';
   auth: string;
   toolCount?: number;
   icon?: LucideIcon;
   logo?: string;
   logoAlt?: string;
+  headline?: string;
+  overview?: string;
+  toolBreakdown?: string;
+  tools?: readonly (readonly [name: string, detail: string])[];
 };
 
 const githubTools = [
@@ -49,28 +53,51 @@ const githubTools = [
   ['github.create_pull_request', 'Open a pull request between pushed branches.'],
 ] as const;
 
+const cloudflareTools = [
+  ['cloudflare.verify_token', 'Confirm that the local API token is active and usable.'],
+  ['cloudflare.list_zones', 'List the zones visible to the configured API token.'],
+  ['cloudflare.get_zone', 'Retrieve one zone and its normalized metadata.'],
+  ['cloudflare.list_dns_records', 'List and filter DNS records within a zone.'],
+  ['cloudflare.get_dns_record', 'Retrieve one DNS record by its exact identifier.'],
+  ['cloudflare.create_dns_record', 'Create a reviewed DNS record in a selected zone.'],
+  ['cloudflare.update_dns_record', 'Update reviewed fields on an existing DNS record.'],
+  ['cloudflare.delete_dns_record', 'Permanently delete one explicitly selected DNS record.'],
+  ['cloudflare.purge_cache_urls', 'Purge up to 30 exact URLs from a zone cache.'],
+  ['cloudflare.purge_everything', 'Purge an entire zone cache after explicit confirmation.'],
+] as const;
+
 const integrations: readonly Integration[] = [
   {
     name: 'GitHub',
     description:
       'Search issues, follow conversations, manage issue state, and open pull requests from your AI client.',
     category: 'Development',
-    status: 'Available in beta',
+    status: 'Available',
     auth: 'Local GITHUB_TOKEN',
     toolCount: 10,
     logo: '/images/providers/github.png',
     logoAlt: 'GitHub',
+    headline: 'Bring GitHub into the conversation.',
+    overview:
+      'Let your AI client search issues, read conversations, update issue state, add comments, and open pull requests. The integration talks directly to GitHub from your machine, so your token stays in your environment.',
+    toolBreakdown: '6 read · 4 write',
+    tools: githubTools,
   },
   {
     name: 'Cloudflare',
     description:
       'Inspect zones and DNS, manage DNS records, and purge cache through a tightly scoped local server.',
     category: 'Infrastructure',
-    status: 'Available in beta',
+    status: 'Available',
     auth: 'Local CLOUDFLARE_API_TOKEN',
     toolCount: 10,
     logo: '/images/providers/cloudflare.png',
     logoAlt: 'Cloudflare',
+    headline: 'Operate Cloudflare without leaving the conversation.',
+    overview:
+      'Let your AI client inspect zones and DNS, create or update records, remove an explicitly selected record, and purge exact URLs or a confirmed full cache. The integration talks directly to Cloudflare from your machine, so your API token stays in your environment.',
+    toolBreakdown: '5 read · 5 DNS/cache',
+    tools: cloudflareTools,
   },
   {
     name: 'Your most-wanted integration',
@@ -327,8 +354,8 @@ export function App() {
     );
   }, [query]);
 
-  const featuredGitHub = filteredIntegrations.find((integration) => integration.name === 'GitHub');
-  const catalogCards = filteredIntegrations.filter((integration) => integration.name !== 'GitHub');
+  const featuredIntegrations = filteredIntegrations.filter((integration) => integration.tools);
+  const catalogCards = filteredIntegrations.filter((integration) => !integration.tools);
 
   return (
     <>
@@ -507,25 +534,30 @@ export function App() {
             {filteredIntegrations.length} {filteredIntegrations.length === 1 ? 'result' : 'results'}
           </p>
 
-          {featuredGitHub ? (
-            <article className="integration-feature" data-reveal="scale">
+          {featuredIntegrations.map((integration) => (
+            <article
+              className={`integration-feature integration-feature-${integration.name.toLowerCase()}`}
+              data-reveal="scale"
+              key={integration.name}
+            >
               <div className="integration-feature-intro">
                 <div className="integration-card-top">
-                  <span className="provider-logo provider-logo-github provider-logo-featured">
-                    <img src="/images/providers/github.png" alt="GitHub" />
+                  <span
+                    className={`provider-logo provider-logo-${integration.name.toLowerCase()} provider-logo-featured`}
+                  >
+                    <img src={integration.logo} alt={integration.logoAlt ?? integration.name} />
                   </span>
-                  <span className="status-chip status-experimental">Available · beta</span>
+                  <span className="status-chip status-available">{integration.status}</span>
                 </div>
-                <p className="integration-category">GitHub integration</p>
-                <h3>Bring GitHub into the conversation.</h3>
-                <p>
-                  Let your AI client search issues, read conversations, update issue state, add
-                  comments, and open pull requests. The integration talks directly to GitHub from
-                  your machine, so your token stays in your environment.
-                </p>
-                <div className="feature-stats" aria-label="GitHub integration attributes">
+                <p className="integration-category">{integration.name} integration</p>
+                <h3>{integration.headline}</h3>
+                <p>{integration.overview}</p>
+                <div
+                  className="feature-stats"
+                  aria-label={`${integration.name} integration attributes`}
+                >
                   <span>
-                    <strong>10</strong> tools
+                    <strong>{integration.toolCount}</strong> tools
                   </span>
                   <span>
                     <strong>stdio</strong> local transport
@@ -540,11 +572,11 @@ export function App() {
                 <div className="toolbox-heading">
                   <span>Available MCP tools</span>
                   <span className="toolbox-readonly">
-                    <ShieldCheck size={13} /> 6 read · 4 write
+                    <ShieldCheck size={13} aria-hidden="true" /> {integration.toolBreakdown}
                   </span>
                 </div>
                 <ul>
-                  {githubTools.map(([name, detail]) => (
+                  {integration.tools?.map(([name, detail]) => (
                     <li key={name}>
                       <code>{name}</code>
                       <span>{detail}</span>
@@ -561,14 +593,14 @@ export function App() {
                     review every file change before approving an installation.
                   </p>
                 </div>
-                <pre aria-label="GitHub integration local run commands">
+                <pre aria-label={`${integration.name} integration shop command`}>
                   <code>
                     <span>$</span> npx @boolink-dev/cli
                   </code>
                 </pre>
               </div>
             </article>
-          ) : null}
+          ))}
 
           {catalogCards.length > 0 ? (
             <div className="integration-grid integration-grid-secondary" data-reveal="stagger">
@@ -636,7 +668,7 @@ export function App() {
           <div className="cli-launchpad" data-reveal="scale">
             <div className="cli-launch-copy">
               <span className="cli-release">
-                <span aria-hidden="true" /> Public package · beta
+                <span aria-hidden="true" /> Public package · v0.4.0
               </span>
               <h3>Meet Boo, your integration shop.</h3>
               <p>
