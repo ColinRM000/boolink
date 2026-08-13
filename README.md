@@ -82,6 +82,8 @@ pnpm release:pack
 
 Validated artifacts are written to the ignored `release/` directory. See
 [the release runbook](docs/releasing.md) for the publication prerequisites and dependency order.
+Pull requests also run the packed CLI's complete install and removal journey on Windows, macOS, and
+Linux; see the [cross-platform verification guide](docs/verification/cross-platform-cli.md).
 
 ## Security
 
