@@ -1889,9 +1889,16 @@ h2 {
   margin: 0;
 }
 
-.roadmap-complete {
+.roadmap-complete,
+.roadmap-available {
   color: var(--green);
   border-color: rgba(99, 230, 167, 0.2);
+}
+
+.roadmap-in-progress {
+  color: var(--cyan-bright);
+  border-color: rgba(44, 213, 235, 0.22);
+  background: rgba(34, 211, 238, 0.07);
 }
 
 .closing-cta {
@@ -2108,8 +2115,27 @@ footer .brand-mark {
     padding: 4.5rem 0 3rem;
   }
 
+  .hero-copy {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
   h1 {
-    font-size: clamp(3.1rem, 14vw, 4.4rem);
+    max-width: 100%;
+    font-size: clamp(2.85rem, 11vw, 3.7rem);
+    letter-spacing: -0.055em;
+  }
+
+  .hero-lede {
+    width: 100%;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .trust-row {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 
   .hero-visual {
@@ -2232,6 +2258,10 @@ footer .brand-mark {
 
   .eyebrow {
     font-size: 0.62rem;
+  }
+
+  .hero-lede {
+    font-size: 1rem;
   }
 
   .site-header .brand-lockup {
