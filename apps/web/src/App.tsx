@@ -1,4 +1,5 @@
 import {
+  Activity,
   ArrowDown,
   ArrowRight,
   Boxes,
@@ -7,14 +8,19 @@ import {
   CircleDot,
   Cloud,
   Code2,
+  Copy,
+  ExternalLink,
   GitBranch,
   KeyRound,
   LockKeyhole,
   PackageCheck,
+  RefreshCw,
+  RotateCcw,
   Search,
   ShieldCheck,
   Sparkles,
   TerminalSquare,
+  Trash2,
   Workflow,
   type LucideIcon,
 } from 'lucide-react';
@@ -83,6 +89,39 @@ const principles = [
   },
 ] as const;
 
+const cliLifecycle = [
+  {
+    icon: TerminalSquare,
+    label: 'Explore',
+    detail: 'Open the interactive integration shop and inspect every tool before installing.',
+    command: 'npx @boolink-dev/cli',
+  },
+  {
+    icon: Activity,
+    label: 'Diagnose',
+    detail: 'Check the managed package, launcher, client configuration, and local state.',
+    command: 'npx @boolink-dev/cli doctor',
+  },
+  {
+    icon: RotateCcw,
+    label: 'Repair',
+    detail: 'Restore an exact managed install without touching credential values.',
+    command: 'npx @boolink-dev/cli repair github',
+  },
+  {
+    icon: RefreshCw,
+    label: 'Upgrade',
+    detail: 'Move to the catalog version with an explicit, previewable write plan.',
+    command: 'npx @boolink-dev/cli upgrade github',
+  },
+  {
+    icon: Trash2,
+    label: 'Remove',
+    detail: 'Cleanly remove only BooLink-managed files and configuration.',
+    command: 'npx @boolink-dev/cli remove github',
+  },
+] as const;
+
 const roadmap = [
   ['Foundation', 'Complete', 'Contracts, registry helpers, MCP v2 adapter, tests, and CI.'],
   [
@@ -92,15 +131,27 @@ const roadmap = [
   ],
   [
     'Registry + CLI',
-    'Now',
-    'The interactive integration shop works; package publishing and downloads come next.',
+    'Complete',
+    'The integration shop and durable local lifecycle are published on npm.',
   ],
+  ['Cloudflare reference', 'Now', 'Prove the contracts against a second provider and auth model.'],
   ['Broader ecosystem', 'Later', 'Additional official integrations before community publishing.'],
 ] as const;
 
 export function App() {
   const [query, setQuery] = useState('');
+  const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  async function copyCommand(command: string) {
+    try {
+      await navigator.clipboard.writeText(command);
+      setCopiedCommand(command);
+      window.setTimeout(() => setCopiedCommand(null), 1600);
+    } catch {
+      setCopiedCommand(null);
+    }
+  }
 
   useEffect(() => {
     const root = document.documentElement;
@@ -276,6 +327,7 @@ export function App() {
         {[
           ['top', 'Intro'],
           ['integrations', 'Integrations'],
+          ['cli', 'CLI'],
           ['principles', 'Trust'],
           ['architecture', 'Architecture'],
           ['roadmap', 'Roadmap'],
@@ -298,6 +350,7 @@ export function App() {
 
         <nav aria-label="Main navigation">
           <a href="#integrations">Integrations</a>
+          <a href="#cli">CLI</a>
           <a href="#architecture">Architecture</a>
           <a href="#roadmap">Roadmap</a>
         </nav>
@@ -330,8 +383,8 @@ export function App() {
                 Explore the project
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
-              <a className="button button-secondary" href="#architecture">
-                See how it works
+              <a className="button button-secondary" href="#cli">
+                Get the CLI
                 <ArrowDown size={18} aria-hidden="true" />
               </a>
             </div>
@@ -532,6 +585,137 @@ export function App() {
           ) : null}
         </section>
 
+        <section className="section cli-section" id="cli" data-scroll-section>
+          <div className="section-heading" data-reveal="rise">
+            <div>
+              <p className="kicker">CLI 0.2.0 · live on npm</p>
+              <h2>One command in. A complete local lifecycle after.</h2>
+            </div>
+            <p>
+              Browse the shop interactively, then diagnose, repair, upgrade, or remove an
+              integration without handing BooLink your credentials.
+            </p>
+          </div>
+
+          <div className="cli-launchpad" data-reveal="scale">
+            <div className="cli-launch-copy">
+              <span className="cli-release">
+                <span aria-hidden="true" /> Public package · experimental
+              </span>
+              <h3>Meet Boo, your integration shop.</h3>
+              <p>
+                No global install is required. Run one command, use the arrow keys to browse, and
+                review tools, capabilities, credential requirements, and every affected file before
+                you approve anything.
+              </p>
+              <div className="cli-safety-row" aria-label="CLI safety properties">
+                <span>
+                  <ShieldCheck size={15} aria-hidden="true" /> Exact versions
+                </span>
+                <span>
+                  <LockKeyhole size={15} aria-hidden="true" /> Local credentials
+                </span>
+                <span>
+                  <RotateCcw size={15} aria-hidden="true" /> Reversible changes
+                </span>
+              </div>
+            </div>
+
+            <div className="cli-window" aria-label="BooLink CLI launch command">
+              <div className="cli-window-bar">
+                <span className="terminal-dots" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                <span>boolink · local terminal</span>
+                <span className="cli-version">v0.2.0</span>
+              </div>
+              <div className="cli-window-body">
+                <p>
+                  <span className="terminal-muted">$</span> npx @boolink-dev/cli
+                </p>
+                <div className="cli-window-preview">
+                  <span className="terminal-cyan">◈ BooLink</span>
+                  <strong>Choose an integration</strong>
+                  <span>› GitHub</span>
+                  <small>4 read-only tools · local stdio</small>
+                </div>
+                <button
+                  className="copy-button copy-button-primary"
+                  type="button"
+                  onClick={() => void copyCommand('npx @boolink-dev/cli')}
+                  aria-label="Copy CLI launch command"
+                >
+                  {copiedCommand === 'npx @boolink-dev/cli' ? (
+                    <Check size={16} aria-hidden="true" />
+                  ) : (
+                    <Copy size={16} aria-hidden="true" />
+                  )}
+                  {copiedCommand === 'npx @boolink-dev/cli' ? 'Copied' : 'Copy command'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="cli-lifecycle-heading" data-reveal="rise">
+            <p className="kicker">After installation</p>
+            <p>
+              Every write is previewed. Add <code>--yes</code> only when you are ready to apply it.
+            </p>
+          </div>
+          <div className="cli-lifecycle" data-reveal="stagger">
+            {cliLifecycle.map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <article className="cli-step" key={step.label}>
+                  <div className="cli-step-top">
+                    <span className="cli-step-number">{String(index + 1).padStart(2, '0')}</span>
+                    <Icon size={19} aria-hidden="true" />
+                  </div>
+                  <h3>{step.label}</h3>
+                  <p>{step.detail}</p>
+                  <div className="cli-step-command">
+                    <code>{step.command}</code>
+                    <button
+                      type="button"
+                      onClick={() => void copyCommand(step.command)}
+                      aria-label={`Copy ${step.label.toLowerCase()} command`}
+                    >
+                      {copiedCommand === step.command ? (
+                        <Check size={14} aria-hidden="true" />
+                      ) : (
+                        <Copy size={14} aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="cli-links" data-reveal="rise">
+            <span>Go deeper</span>
+            <a
+              href="https://www.npmjs.com/package/@boolink-dev/cli"
+              target="_blank"
+              rel="noreferrer"
+            >
+              npm package <ExternalLink size={14} aria-hidden="true" />
+            </a>
+            <a
+              href="https://github.com/ColinRM000/boolink/tree/main/packages/cli"
+              target="_blank"
+              rel="noreferrer"
+            >
+              CLI guide <ExternalLink size={14} aria-hidden="true" />
+            </a>
+            <a href="https://github.com/ColinRM000/boolink" target="_blank" rel="noreferrer">
+              GitHub source <ExternalLink size={14} aria-hidden="true" />
+            </a>
+          </div>
+        </section>
+
         <section className="section principles-section" id="principles" data-scroll-section>
           <div className="section-heading compact" data-reveal="rise">
             <div>
@@ -646,12 +830,12 @@ export function App() {
             <p className="kicker">The foundation is live</p>
             <h2>Secure integrations. Conventional tools. A little more spirit.</h2>
             <p>
-              The GitHub reference integration is built. The registry and CLI are now the active
-              milestone on the path to a clean one-command install.
+              The GitHub reference integration and one-command CLI are live. Next, BooLink proves
+              the same local-first contracts against Cloudflare.
             </p>
           </div>
-          <a className="button button-primary" href="#roadmap">
-            Follow the build
+          <a className="button button-primary" href="#cli">
+            Open the shop
             <ArrowRight size={18} aria-hidden="true" />
           </a>
         </section>
