@@ -30,7 +30,7 @@ type Integration = {
   name: string;
   description: string;
   category: string;
-  status: 'Experimental' | 'Planned' | 'To be selected';
+  status: 'Available in beta' | 'Coming soon' | 'Community choice';
   auth: string;
   icon: LucideIcon;
 };
@@ -52,26 +52,27 @@ const integrations: readonly Integration[] = [
   {
     name: 'GitHub',
     description:
-      'A complete local GitHub MVP for reading and carefully scoped issue and pull-request collaboration.',
+      'Search issues, follow conversations, manage issue state, and open pull requests from your AI client.',
     category: 'Development',
-    status: 'Experimental',
+    status: 'Available in beta',
     auth: 'Local GITHUB_TOKEN',
     icon: GitBranch,
   },
   {
     name: 'Cloudflare',
-    description: 'Infrastructure visibility and carefully scoped operational capabilities.',
+    description:
+      'Give agents secure, local access to infrastructure visibility and common operations.',
     category: 'Infrastructure',
-    status: 'Planned',
+    status: 'Coming soon',
     auth: 'Local API token',
     icon: Cloud,
   },
   {
-    name: 'Third reference integration',
+    name: 'Your most-wanted integration',
     description:
-      'Selected for architectural contrast after the first two integrations are validated.',
-    category: 'Research',
-    status: 'To be selected',
+      'Future integrations will be prioritized around the tools the community uses most.',
+    category: 'Community',
+    status: 'Community choice',
     auth: 'Provider-specific',
     icon: Boxes,
   },
@@ -90,8 +91,8 @@ const principles = [
   },
   {
     icon: PackageCheck,
-    label: 'One coherent product',
-    detail: 'Shared contracts, errors, tests, and documentation across official integrations.',
+    label: 'Predictable everywhere',
+    detail: 'Consistent installation, permissions, errors, and documentation across integrations.',
   },
 ] as const;
 
@@ -129,19 +130,26 @@ const cliLifecycle = [
 ] as const;
 
 const roadmap = [
-  ['Foundation', 'Complete', 'Contracts, registry helpers, MCP v2 adapter, tests, and CI.'],
   [
-    'GitHub reference',
-    'Complete',
-    'Ten read and write tools complete the scoped local-first GitHub MVP.',
+    'GitHub integration',
+    'Available',
+    'Ten tools for issues, conversations, and pull requests are available today.',
   ],
   [
-    'Registry + CLI',
-    'Complete',
-    'The integration shop and durable local lifecycle are published on npm.',
+    'BooLink CLI',
+    'Available',
+    'Browse, install, diagnose, upgrade, repair, and remove integrations from one local CLI.',
   ],
-  ['Cloudflare reference', 'Now', 'Prove the contracts against a second provider and auth model.'],
-  ['Broader ecosystem', 'Later', 'Additional official integrations before community publishing.'],
+  [
+    'Cloudflare integration',
+    'In progress',
+    'Secure infrastructure tools are next on the integration catalog.',
+  ],
+  [
+    'More integrations',
+    'Planned',
+    'New providers will follow community demand and real use cases.',
+  ],
 ] as const;
 
 export function App() {
@@ -336,7 +344,7 @@ export function App() {
           ['cli', 'CLI'],
           ['principles', 'Trust'],
           ['architecture', 'Architecture'],
-          ['roadmap', 'Roadmap'],
+          ['roadmap', "What's next"],
         ].map(([id, label]) => (
           <a href={`#${id}`} data-chapter-link={id} key={id}>
             <i aria-hidden="true" />
@@ -358,12 +366,12 @@ export function App() {
           <a href="#integrations">Integrations</a>
           <a href="#cli">CLI</a>
           <a href="#architecture">Architecture</a>
-          <a href="#roadmap">Roadmap</a>
+          <a href="#roadmap">What&apos;s next</a>
         </nav>
 
         <a className="header-status" href="#roadmap">
           <span className="status-pulse" aria-hidden="true" />
-          Building in public
+          GitHub available
         </a>
       </header>
 
@@ -381,12 +389,12 @@ export function App() {
               Give your AI a <span>ghost in the machine.</span>
             </h1>
             <p className="hero-lede">
-              BooLink is building maintained integrations that connect AI agents to the tools you
-              already use—without sending your credentials through BooLink.
+              BooLink connects AI agents to the tools you already use through local, inspectable MCP
+              integrations—without routing your credentials through a hosted middleman.
             </p>
             <div className="hero-actions">
               <a className="button button-primary" href="#integrations">
-                Explore the project
+                Browse integrations
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
               <a className="button button-secondary" href="#cli">
@@ -434,7 +442,7 @@ export function App() {
                 <br />
                 <span className="terminal-cyan">◈</span> Credentials stay on this machine
                 <br />
-                <span className="terminal-green">✓</span> GitHub reference integration{' '}
+                <span className="terminal-green">✓</span> GitHub integration{' '}
                 <span className="terminal-muted">10 tools ready</span>
               </code>
             </div>
@@ -443,16 +451,16 @@ export function App() {
 
         <section
           className="signal-strip"
-          aria-label="BooLink foundation status"
+          aria-label="BooLink product highlights"
           data-reveal="stagger"
         >
           <div>
-            <strong>2026-07-28</strong>
-            <span>Current MCP era</span>
+            <strong>MIT</strong>
+            <span>Open-source license</span>
           </div>
           <div>
-            <strong>3</strong>
-            <span>Foundation packages</span>
+            <strong>Local</strong>
+            <span>Runs beside your AI client</span>
           </div>
           <div>
             <strong>10</strong>
@@ -471,13 +479,13 @@ export function App() {
               <h2>Start with a capability, not custom plumbing.</h2>
             </div>
             <p>
-              The catalog is deliberately small while the contracts are proven. Status labels are
-              real—nothing below is presented as available before it is ready.
+              Install only what you need, inspect every available tool, and see credential and
+              permission requirements before an integration touches your setup.
             </p>
           </div>
 
           <label className="integration-search" data-reveal="rise">
-            <span className="sr-only">Search planned BooLink integrations</span>
+            <span className="sr-only">Search BooLink integrations</span>
             <Search size={20} aria-hidden="true" />
             <input
               ref={searchRef}
@@ -502,15 +510,14 @@ export function App() {
                   <span className="integration-icon integration-icon-large">
                     <GitBranch size={30} aria-hidden="true" />
                   </span>
-                  <span className="status-chip status-experimental">
-                    MVP complete · experimental
-                  </span>
+                  <span className="status-chip status-experimental">Available · beta</span>
                 </div>
-                <p className="integration-category">Reference integration</p>
-                <h3>GitHub MCP is complete for the scoped MVP.</h3>
+                <p className="integration-category">GitHub integration</p>
+                <h3>Bring GitHub into the conversation.</h3>
                 <p>
-                  The first real BooLink integration runs beside your AI client, talks directly to
-                  GitHub, and keeps its token out of BooLink infrastructure.
+                  Let your AI client search issues, read conversations, update issue state, add
+                  comments, and open pull requests. The integration talks directly to GitHub from
+                  your machine, so your token stays in your environment.
                 </p>
                 <div className="feature-stats" aria-label="GitHub integration attributes">
                   <span>
@@ -596,7 +603,7 @@ export function App() {
         <section className="section cli-section" id="cli" data-scroll-section>
           <div className="section-heading" data-reveal="rise">
             <div>
-              <p className="kicker">CLI 0.3.0 · GitHub MVP release</p>
+              <p className="kicker">Available on npm · CLI 0.3.0</p>
               <h2>One command in. A complete local lifecycle after.</h2>
             </div>
             <p>
@@ -608,7 +615,7 @@ export function App() {
           <div className="cli-launchpad" data-reveal="scale">
             <div className="cli-launch-copy">
               <span className="cli-release">
-                <span aria-hidden="true" /> Public package · experimental
+                <span aria-hidden="true" /> Public package · beta
               </span>
               <h3>Meet Boo, your integration shop.</h3>
               <p>
@@ -647,7 +654,7 @@ export function App() {
                   <span className="terminal-cyan">◈ BooLink</span>
                   <strong>Choose an integration</strong>
                   <span>› GitHub</span>
-                  <small>10 scoped tools · local stdio</small>
+                  <small>6 read + 4 write tools · local stdio</small>
                 </div>
                 <button
                   className="copy-button copy-button-primary"
@@ -808,12 +815,12 @@ export function App() {
         <section className="section roadmap-section" id="roadmap" data-scroll-section>
           <div className="section-heading" data-reveal="rise">
             <div>
-              <p className="kicker">The road to a useful MVP</p>
-              <h2>Build the trust layer before the catalog.</h2>
+              <p className="kicker">Available now and coming next</p>
+              <h2>Start with GitHub. Add more as BooLink grows.</h2>
             </div>
             <p>
-              Three excellent integrations are more useful than thirty unreliable wrappers. Each
-              phase stays runnable and verifiable.
+              BooLink prioritizes useful, well-documented integrations over a long catalog of thin
+              wrappers. Here is what you can use today and what is coming next.
             </p>
           </div>
           <div className="roadmap-list" data-reveal="roadmap">
@@ -821,7 +828,11 @@ export function App() {
               <article className="roadmap-item" key={title}>
                 <span className="roadmap-number">{String(index + 1).padStart(2, '0')}</span>
                 <div>
-                  <span className={`roadmap-status roadmap-${status.toLowerCase()}`}>{status}</span>
+                  <span
+                    className={`roadmap-status roadmap-${status.toLowerCase().replaceAll(' ', '-')}`}
+                  >
+                    {status}
+                  </span>
                   <h3>{title}</h3>
                   <p>{detail}</p>
                 </div>
@@ -835,11 +846,11 @@ export function App() {
             <img src="/images/boolink-mascot.png" alt="" />
           </div>
           <div>
-            <p className="kicker">The foundation is live</p>
-            <h2>Secure integrations. Conventional tools. A little more spirit.</h2>
+            <p className="kicker">Ready to connect</p>
+            <h2>Give your AI useful tools without giving up control.</h2>
             <p>
-              The GitHub reference integration and one-command CLI are live. Next, BooLink proves
-              the same local-first contracts against Cloudflare.
+              Install BooLink, connect GitHub, and give your agent a clear, inspectable set of
+              capabilities—all running locally in your environment.
             </p>
           </div>
           <a className="button button-primary" href="#cli">
