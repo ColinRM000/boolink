@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { mergeCodexConfiguration, renderCodexBlock, renderCustomJson } from './adapters.js';
+import {
+  mergeCodexConfiguration,
+  removeCodexConfiguration,
+  renderCodexBlock,
+  renderCustomJson,
+} from './adapters.js';
 
 const launch = {
   id: 'github',
@@ -24,6 +29,14 @@ describe('client configuration adapters', () => {
     const merged = mergeCodexConfiguration('model = "gpt-5"\n', launch);
     expect(merged).toMatch(/^model = "gpt-5"/u);
     expect(() => mergeCodexConfiguration(merged, launch)).toThrow(/already contains/u);
+  });
+
+  it('removes only an exact BooLink-managed Codex block', () => {
+    const merged = mergeCodexConfiguration('model = "gpt-5"\n', launch);
+    expect(removeCodexConfiguration(merged, launch)).toBe('model = "gpt-5"\n');
+    expect(() => removeCodexConfiguration(merged.replace('writes', 'untrusted'), launch)).toThrow(
+      /changed/u,
+    );
   });
 
   it('renders neutral JSON without credential values', () => {

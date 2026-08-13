@@ -214,6 +214,8 @@ function renderConfirm(
     '',
     `${color('Integration', MUTED, useColor)}   ${integration.name} v${integration.version}`,
     `${color('Client', MUTED, useColor)}        ${state.client === 'codex' ? 'Codex / ChatGPT desktop' : 'No client changes'}`,
+    `${color('Package', MUTED, useColor)}       ${integration.packageName}@${integration.version}`,
+    `${color('Install path', MUTED, useColor)}  ${path.join(boolinkHome, 'integrations', integration.id, integration.version)}`,
     `${color('State file', MUTED, useColor)}    ${path.join(boolinkHome, 'installations.json')}`,
   ];
 
@@ -227,6 +229,7 @@ function renderConfirm(
     `${color('Credential', MUTED, useColor)}    ${variables.join(', ') || 'none'} ${credentialReady ? color('● detected', GREEN, useColor) : color('○ missing — install can continue, tools need it later', YELLOW, useColor)}`,
     '',
     color('No credential values will be written to BooLink files.', GREEN, useColor),
+    color('npm lifecycle scripts are disabled during installation.', GREEN, useColor),
     '',
     color('Y Approve install · N Go back · Q Quit', MUTED, useColor),
   );

@@ -13,7 +13,7 @@ describe('installation state', () => {
     expect(await readInstallationState(filePath)).toEqual(createEmptyState());
 
     await writeInstallationState(filePath, {
-      schemaVersion: 1,
+      schemaVersion: 2,
       integrations: [
         {
           id: 'github',
@@ -24,6 +24,7 @@ describe('installation state', () => {
           args: ['/tmp/github/server.js'],
           requiredEnvironment: ['GITHUB_TOKEN'],
           clientConfigurations: [],
+          installationDirectory: '/tmp/boolink/github',
         },
       ],
     });
@@ -32,5 +33,38 @@ describe('installation state', () => {
       integrations: [{ id: 'github', requiredEnvironment: ['GITHUB_TOKEN'] }],
     });
     expect(await readFile(filePath, 'utf8')).not.toContain('github_pat_');
+  });
+
+  it('reads release 0.1.0 state as a legacy unmanaged installation', async () => {
+    const directory = await mkdtemp(path.join(os.tmpdir(), 'boolink-state-v1-'));
+    const filePath = path.join(directory, 'installations.json');
+    await import('node:fs/promises').then(({ writeFile }) =>
+      writeFile(
+        filePath,
+        `${JSON.stringify({
+          schemaVersion: 1,
+          integrations: [
+            {
+              id: 'github',
+              packageName: '@boolink-dev/github',
+              version: '0.1.0',
+              installedAt: '2026-08-12T12:00:00.000Z',
+              command: 'node',
+              args: ['/temporary/npm/cache/server.js'],
+              requiredEnvironment: ['GITHUB_TOKEN'],
+              clientConfigurations: [],
+            },
+          ],
+        })}\n`,
+        'utf8',
+      ),
+    );
+
+    const migrated = await readInstallationState(filePath);
+    expect(migrated).toMatchObject({
+      schemaVersion: 2,
+      integrations: [{ id: 'github' }],
+    });
+    expect(migrated.integrations[0]?.installationDirectory).toBeUndefined();
   });
 });

@@ -9,6 +9,9 @@ BooLink integrations.
 boo search [query]
 boo info <integration>
 boo add <integration> [--client codex|custom-json] [--output <path>] [--yes]
+boo remove <integration> [--yes]
+boo repair <integration> [--yes]
+boo upgrade <integration> [--yes]
 boo list
 boo doctor
 ```
@@ -33,8 +36,8 @@ node packages/cli/dist/bin.js search github
 
 ## Safe installation flow
 
-`boo add` previews its complete write plan by default. It changes files only when `--yes` is
-present.
+`boo add`, `boo remove`, `boo repair`, and `boo upgrade` preview their complete write plan by
+default. They change files only when `--yes` is present.
 
 ```bash
 node packages/cli/dist/bin.js add github --client codex
@@ -54,10 +57,28 @@ For another MCP client, generate a neutral JSON document at a new path:
 node packages/cli/dist/bin.js add github --client custom-json --output ./boolink-github.json --yes
 ```
 
-The CLI records installation metadata in `~/.boolink/installations.json`. It records credential
-variable names such as `GITHUB_TOKEN`, never credential values. Set the variable in the environment
-that launches the MCP client. Set `BOOLINK_HOME` to use a different installation-state directory,
-including for isolated tests.
+The CLI downloads the exact catalog version with npm lifecycle scripts disabled, verifies its
+published `./server` export, and stores it beneath
+`~/.boolink/integrations/<integration>/<version>`. Client configuration points to a stable local
+launcher instead of npm's temporary `npx` cache.
+
+Installation metadata lives in `~/.boolink/installations.json`. It records credential variable
+names such as `GITHUB_TOKEN`, never credential values. Provider credentials are removed from the
+environment inherited by the npm subprocess. Set the variable in the environment that launches
+the MCP client. Set `BOOLINK_HOME` to use a different installation-state directory, including for
+isolated tests.
+
+```bash
+boo doctor
+boo repair github
+boo repair github --yes
+boo upgrade github --yes
+boo remove github --yes
+```
+
+Removal deletes only an exact BooLink-managed configuration block. If the block was manually
+edited, BooLink stops and asks you to reconcile it instead of guessing. State and client files are
+written atomically, with rollback around installation and configuration failures.
 
 ## Current limitations
 
@@ -65,4 +86,5 @@ including for isolated tests.
 - GitHub is the only catalog entry and server package.
 - The Codex adapter and neutral JSON output are the first supported client paths.
 - `doctor` performs local diagnostics only. It does not call GitHub or send telemetry.
-- Removal, authentication helpers, live API tests, package downloading, and upgrades are planned.
+- `upgrade` follows the version in the bundled registry; refresh the CLI to receive a newer catalog.
+- Authentication helpers and live API verification are planned.
