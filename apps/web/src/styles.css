@@ -913,6 +913,21 @@ h2 {
   pointer-events: none;
 }
 
+.integration-feature-cloudflare {
+  border-color: rgba(249, 128, 31, 0.32);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(249, 128, 31, 0.13), transparent 24rem),
+    radial-gradient(circle at 100% 100%, rgba(251, 173, 52, 0.1), transparent 28rem),
+    linear-gradient(145deg, rgba(24, 28, 43, 0.96), rgba(10, 13, 25, 0.97));
+}
+
+.integration-feature-cloudflare::before {
+  border-color: rgba(251, 173, 52, 0.12);
+  box-shadow:
+    0 0 0 2.5rem rgba(249, 128, 31, 0.025),
+    0 0 0 5rem rgba(251, 173, 52, 0.018);
+}
+
 .integration-feature-intro,
 .integration-toolbox,
 .integration-quickstart {
@@ -927,7 +942,8 @@ h2 {
   padding: 1.25rem;
 }
 
-.status-experimental {
+.status-experimental,
+.status-available {
   color: var(--green);
   border-color: rgba(99, 230, 167, 0.24);
   background: rgba(99, 230, 167, 0.07);
@@ -1020,6 +1036,7 @@ h2 {
   color: var(--cyan-bright);
   font-family: 'JetBrains Mono', Consolas, monospace;
   font-size: 0.7rem;
+  overflow-wrap: anywhere;
 }
 
 .integration-toolbox li span {
@@ -1080,7 +1097,7 @@ h2 {
 }
 
 .integration-grid-secondary {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
 }
 
 .integration-card,
