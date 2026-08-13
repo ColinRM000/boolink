@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { cloudflareManifest } from '@boolink-dev/cloudflare';
 import { githubManifest } from '@boolink-dev/github';
 import { bundledRegistry, createRegistry, parseRegistry, searchRegistry } from './index.js';
 import type { IntegrationManifest } from '@boolink-dev/core';
@@ -24,8 +25,8 @@ function manifest(id: string, name: string, category: string): IntegrationManife
 }
 
 describe('registry', () => {
-  it('publishes the GitHub manifest without integration-owned metadata drift', () => {
-    expect(bundledRegistry.integrations).toEqual([githubManifest]);
+  it('publishes integration-owned manifests without metadata drift', () => {
+    expect(bundledRegistry.integrations).toEqual([cloudflareManifest, githubManifest]);
   });
 
   it('sorts integrations deterministically and supports multi-term search', () => {

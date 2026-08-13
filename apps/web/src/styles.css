@@ -1181,6 +1181,8 @@ h2 {
 }
 
 .status-in-development,
+.status-available-in-beta,
+.roadmap-available,
 .roadmap-now {
   color: var(--cyan-bright);
   border-color: rgba(44, 213, 235, 0.22);

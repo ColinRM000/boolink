@@ -34,8 +34,14 @@ const packages = [
   {
     directory: 'packages/registry',
     name: '@boolink-dev/registry',
-    version: '0.2.0',
+    version: '0.3.0',
     required: ['package/dist/index.js', 'package/src/catalog.json'],
+  },
+  {
+    directory: 'integrations/cloudflare',
+    name: '@boolink-dev/cloudflare',
+    version: '0.1.0',
+    required: ['package/dist/index.js', 'package/dist/server.js'],
   },
   {
     directory: 'integrations/github',
@@ -46,7 +52,7 @@ const packages = [
   {
     directory: 'packages/cli',
     name: '@boolink-dev/cli',
-    version: '0.3.0',
+    version: '0.4.0',
     required: ['package/dist/index.js', 'package/dist/bin.js'],
   },
 ];
@@ -191,56 +197,85 @@ try {
   );
 
   for (const executableName of ['boolink', 'boo']) {
-    const searchOutput = runPnpm(
-      ['--dir', smokeDirectory, 'exec', executableName, 'search', 'github'],
-      { capture: true },
-    );
-    if (!searchOutput.includes('github') || !searchOutput.includes('10 tools')) {
-      throw new Error(
-        `The installed ${executableName} command could not discover the packaged GitHub integration.`,
+    for (const integrationId of ['cloudflare', 'github']) {
+      const searchOutput = runPnpm(
+        ['--dir', smokeDirectory, 'exec', executableName, 'search', integrationId],
+        { capture: true },
       );
+      if (!searchOutput.includes(integrationId) || !searchOutput.includes('10 tools')) {
+        throw new Error(
+          `The installed ${executableName} command could not discover the packaged ${integrationId} integration.`,
+        );
+      }
     }
   }
 
-  const githubServer = path.join(
-    smokeDirectory,
-    'node_modules',
-    '@boolink-dev',
-    'github',
-    'dist',
-    'server.js',
-  );
-  const client = new Client(
-    { name: 'boolink-packed-release-smoke', version: '0.0.0' },
-    { versionNegotiation: { mode: 'auto' } },
-  );
-  const transport = new StdioClientTransport({
-    command: process.execPath,
-    args: [githubServer],
-    env: { ...process.env, GITHUB_TOKEN: 'github_pat_packaged_discovery_only' },
-    stderr: 'pipe',
-  });
-  try {
-    await client.connect(transport);
-    const listed = await client.listTools();
-    const toolNames = listed.tools.map(({ name }) => name).sort();
-    const expectedToolNames = [
-      'github.add_issue_comment',
-      'github.create_issue',
-      'github.create_pull_request',
-      'github.get_authenticated_user',
-      'github.get_issue',
-      'github.get_pull_request',
-      'github.list_issue_comments',
-      'github.list_pull_requests',
-      'github.search_issues',
-      'github.update_issue',
-    ];
-    if (JSON.stringify(toolNames) !== JSON.stringify(expectedToolNames)) {
-      throw new Error('The packed GitHub stdio server did not expose the expected 10-tool MVP.');
+  const integrationSmokes = [
+    {
+      id: 'cloudflare',
+      env: { CLOUDFLARE_API_TOKEN: 'packaged_discovery_only' },
+      expectedToolNames: [
+        'cloudflare.create_dns_record',
+        'cloudflare.delete_dns_record',
+        'cloudflare.get_dns_record',
+        'cloudflare.get_zone',
+        'cloudflare.list_dns_records',
+        'cloudflare.list_zones',
+        'cloudflare.purge_cache_urls',
+        'cloudflare.purge_everything',
+        'cloudflare.update_dns_record',
+        'cloudflare.verify_token',
+      ],
+    },
+    {
+      id: 'github',
+      env: { GITHUB_TOKEN: 'github_pat_packaged_discovery_only' },
+      expectedToolNames: [
+        'github.add_issue_comment',
+        'github.create_issue',
+        'github.create_pull_request',
+        'github.get_authenticated_user',
+        'github.get_issue',
+        'github.get_pull_request',
+        'github.list_issue_comments',
+        'github.list_pull_requests',
+        'github.search_issues',
+        'github.update_issue',
+      ],
+    },
+  ];
+
+  for (const integrationSmoke of integrationSmokes) {
+    const server = path.join(
+      smokeDirectory,
+      'node_modules',
+      '@boolink-dev',
+      integrationSmoke.id,
+      'dist',
+      'server.js',
+    );
+    const client = new Client(
+      { name: 'boolink-packed-release-smoke', version: '0.0.0' },
+      { versionNegotiation: { mode: 'auto' } },
+    );
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: [server],
+      env: { ...process.env, ...integrationSmoke.env },
+      stderr: 'pipe',
+    });
+    try {
+      await client.connect(transport);
+      const listed = await client.listTools();
+      const toolNames = listed.tools.map(({ name }) => name).sort();
+      if (JSON.stringify(toolNames) !== JSON.stringify(integrationSmoke.expectedToolNames)) {
+        throw new Error(
+          `The packed ${integrationSmoke.id} stdio server did not expose the expected 10-tool MVP.`,
+        );
+      }
+    } finally {
+      await client.close();
     }
-  } finally {
-    await client.close();
   }
 } finally {
   await rm(smokeDirectory, { recursive: true, force: true });

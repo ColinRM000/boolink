@@ -32,6 +32,7 @@ To build and run it from this repository instead:
 ```bash
 pnpm --filter @boolink-dev/cli build
 node packages/cli/dist/bin.js search github
+node packages/cli/dist/bin.js search cloudflare
 ```
 
 ## Safe installation flow
@@ -42,6 +43,7 @@ default. They change files only when `--yes` is present.
 ```bash
 node packages/cli/dist/bin.js add github --client codex
 node packages/cli/dist/bin.js add github --client codex --yes
+node packages/cli/dist/bin.js add cloudflare --client codex
 ```
 
 Codex configuration defaults to `~/.codex/config.toml`. Use `--output` to target a project-scoped
@@ -63,7 +65,7 @@ published `./server` export, and stores it beneath
 launcher instead of npm's temporary `npx` cache.
 
 Installation metadata lives in `~/.boolink/installations.json`. It records credential variable
-names such as `GITHUB_TOKEN`, never credential values. Provider credentials are removed from the
+names such as `GITHUB_TOKEN` and `CLOUDFLARE_API_TOKEN`, never credential values. Provider credentials are removed from the
 environment inherited by the npm subprocess. Set the variable in the environment that launches
 the MCP client. Set `BOOLINK_HOME` to use a different installation-state directory, including for
 isolated tests.
@@ -83,9 +85,9 @@ written atomically, with rollback around installation and configuration failures
 ## Current limitations
 
 - The CLI is experimental and its public API may change before 1.0.
-- GitHub is the only catalog entry and server package.
+- GitHub and Cloudflare are the two official catalog entries and server packages.
 - The Codex adapter and neutral JSON output are the first supported client paths.
-- `doctor` performs local diagnostics only. It does not call GitHub or send telemetry.
+- `doctor` performs local diagnostics only. It does not call providers or send telemetry.
 - `upgrade` follows the version in the bundled registry; refresh the CLI to receive a newer catalog.
 - The CLI references credential variable names but does not create provider tokens or store their
   values; provider-side token setup remains explicit.

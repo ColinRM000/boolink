@@ -1,6 +1,6 @@
 {
   "name": "@boolink-dev/registry",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Machine-readable BooLink registry contracts and discovery helpers.",
   "license": "MIT",
   "homepage": "https://boolink.dev",
@@ -46,6 +46,7 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@boolink-dev/cloudflare": "workspace:^",
     "@boolink-dev/github": "workspace:^"
   }
 }

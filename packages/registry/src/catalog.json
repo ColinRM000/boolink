@@ -1,7 +1,127 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-12T00:00:00.000Z",
+  "generatedAt": "2026-08-13T00:00:00.000Z",
   "integrations": [
+    {
+      "schemaVersion": 1,
+      "id": "cloudflare",
+      "name": "Cloudflare",
+      "description": "Connect AI agents to Cloudflare zones, DNS records, and cache operations through a local MCP server.",
+      "version": "0.1.0",
+      "provider": "Cloudflare",
+      "category": "infrastructure",
+      "packageName": "@boolink-dev/cloudflare",
+      "repositoryUrl": "https://github.com/ColinRM000/boolink",
+      "documentationUrl": "https://boolink.dev/integrations/cloudflare",
+      "verification": "experimental",
+      "authentication": {
+        "type": "bearer-token",
+        "instructionsUrl": "https://developers.cloudflare.com/fundamentals/api/get-started/create-token/",
+        "requirements": [
+          {
+            "id": "token",
+            "label": "Cloudflare API token",
+            "description": "An API token restricted to the zones and Zone Read, DNS Read or Write, and Cache Purge permissions the user explicitly intends to expose.",
+            "source": "environment",
+            "environmentVariables": ["CLOUDFLARE_API_TOKEN"],
+            "required": true
+          }
+        ]
+      },
+      "transports": ["stdio"],
+      "tools": [
+        {
+          "name": "cloudflare.verify_token",
+          "title": "Verify Cloudflare API token",
+          "description": "Verifies the locally configured Cloudflare API token and returns only its identifier, status, and validity dates. Use it before other operations to confirm authentication. It accepts no inputs and has no side effects.",
+          "capabilities": ["read"],
+          "destructive": false,
+          "idempotent": true,
+          "requiredScopes": []
+        },
+        {
+          "name": "cloudflare.list_zones",
+          "title": "List Cloudflare zones",
+          "description": "Lists zones visible to the local token with optional name, status, account, and pagination filters. Use it to discover the exact zone ID needed by DNS and cache tools. It has no side effects.",
+          "capabilities": ["read"],
+          "destructive": false,
+          "idempotent": true,
+          "requiredScopes": ["Zone: Read"]
+        },
+        {
+          "name": "cloudflare.get_zone",
+          "title": "Get Cloudflare zone",
+          "description": "Returns one Cloudflare zone by its exact 32-character ID, including status, type, nameservers, account summary, and timestamps. Use it to inspect a known zone. It has no side effects.",
+          "capabilities": ["read"],
+          "destructive": false,
+          "idempotent": true,
+          "requiredScopes": ["Zone: Read"]
+        },
+        {
+          "name": "cloudflare.list_dns_records",
+          "title": "List Cloudflare DNS records",
+          "description": "Lists DNS records in one zone with bounded type, name, content, proxy, and pagination filters. Use it to inspect existing records and obtain exact record IDs before any change. It has no side effects.",
+          "capabilities": ["read"],
+          "destructive": false,
+          "idempotent": true,
+          "requiredScopes": ["DNS: Read"]
+        },
+        {
+          "name": "cloudflare.get_dns_record",
+          "title": "Get Cloudflare DNS record",
+          "description": "Returns one DNS record by exact zone and record IDs. Use it to review the current name, value, TTL, proxy state, comment, and tags before changing or deleting a record. It has no side effects.",
+          "capabilities": ["read"],
+          "destructive": false,
+          "idempotent": true,
+          "requiredScopes": ["DNS: Read"]
+        },
+        {
+          "name": "cloudflare.create_dns_record",
+          "title": "Create Cloudflare DNS record",
+          "description": "Creates a DNS record and can immediately change how a hostname resolves or is proxied. Use it only after the user reviews the exact zone, type, name, content, TTL, and proxy state. Repeated calls can create conflicting records.",
+          "capabilities": ["create", "administrative"],
+          "destructive": false,
+          "idempotent": false,
+          "requiredScopes": ["DNS: Write"]
+        },
+        {
+          "name": "cloudflare.update_dns_record",
+          "title": "Update Cloudflare DNS record",
+          "description": "Updates supplied fields on one exact DNS record and can redirect traffic or change proxy behavior. Use it only after reading the current record and reviewing every change. At least one field is required; this is destructive and administrative.",
+          "capabilities": ["modify", "administrative"],
+          "destructive": true,
+          "idempotent": true,
+          "requiredScopes": ["DNS: Write"]
+        },
+        {
+          "name": "cloudflare.delete_dns_record",
+          "title": "Delete Cloudflare DNS record",
+          "description": "Permanently deletes one DNS record by exact zone and record IDs, which can make services unreachable. Use it only after the user reviews the current record and explicitly intends its removal. This action is destructive.",
+          "capabilities": ["delete", "administrative"],
+          "destructive": true,
+          "idempotent": true,
+          "requiredScopes": ["DNS: Write"]
+        },
+        {
+          "name": "cloudflare.purge_cache_urls",
+          "title": "Purge Cloudflare cache URLs",
+          "description": "Purges up to 30 exact HTTP or HTTPS URLs from one zone cache so following requests fetch fresh content. Prefer this bounded tool over a full purge. It changes production cache state, may increase origin load, and is destructive.",
+          "capabilities": ["modify", "administrative"],
+          "destructive": true,
+          "idempotent": true,
+          "requiredScopes": ["Cache Purge"]
+        },
+        {
+          "name": "cloudflare.purge_everything",
+          "title": "Purge all Cloudflare zone cache",
+          "description": "Purges every cached object for one zone and can cause a substantial temporary increase in origin traffic. Use it only when a targeted URL purge cannot solve the problem and the user explicitly confirms the full-zone effect. This action is destructive.",
+          "capabilities": ["modify", "administrative"],
+          "destructive": true,
+          "idempotent": true,
+          "requiredScopes": ["Cache Purge"]
+        }
+      ]
+    },
     {
       "schemaVersion": 1,
       "id": "github",
