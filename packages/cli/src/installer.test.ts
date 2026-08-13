@@ -1,10 +1,10 @@
-import { mkdtemp, readFile, readdir, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readdir, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { getManagedInstallPaths, installManagedPackage } from './installer.js';
+import { getManagedInstallPaths, installManagedPackage, locateNpmCli } from './installer.js';
 
 async function fakeNpm(directory: string, fail = false): Promise<string> {
   const script = path.join(directory, fail ? 'fake-npm-fail.mjs' : 'fake-npm.mjs');
@@ -30,6 +30,16 @@ async function fakeNpm(directory: string, fail = false): Promise<string> {
 }
 
 describe('managed package installer', () => {
+  it('locates npm in the standard Unix Node distribution layout', async () => {
+    const directory = await mkdtemp(path.join(os.tmpdir(), 'boolink-node-layout-'));
+    const nodeExecutable = path.join(directory, 'bin', 'node');
+    const npmCli = path.join(directory, 'lib', 'node_modules', 'npm', 'bin', 'npm-cli.js');
+    await mkdir(path.dirname(npmCli), { recursive: true });
+    await writeFile(npmCli, '// npm cli', 'utf8');
+
+    await expect(locateNpmCli(nodeExecutable, {})).resolves.toBe(npmCli);
+  });
+
   it('installs an exact package into a versioned directory and writes a stable launcher', async () => {
     const directory = await mkdtemp(path.join(os.tmpdir(), 'boolink-installer-'));
     const boolinkHome = path.join(directory, '.boolink');

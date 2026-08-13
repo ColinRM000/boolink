@@ -102,13 +102,22 @@ async function resolveInstalledServer(
   return serverPath;
 }
 
-async function locateNpmCli(
+export async function locateNpmCli(
   nodeExecutable: string,
   environment: NodeJS.ProcessEnv,
 ): Promise<string> {
   const candidates = [
     environment.npm_execpath,
     path.join(path.dirname(nodeExecutable), 'node_modules', 'npm', 'bin', 'npm-cli.js'),
+    path.join(
+      path.dirname(nodeExecutable),
+      '..',
+      'lib',
+      'node_modules',
+      'npm',
+      'bin',
+      'npm-cli.js',
+    ),
   ].filter((candidate): candidate is string => Boolean(candidate));
 
   for (const candidate of candidates) {
