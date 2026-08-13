@@ -87,4 +87,7 @@ written atomically, with rollback around installation and configuration failures
 - The Codex adapter and neutral JSON output are the first supported client paths.
 - `doctor` performs local diagnostics only. It does not call GitHub or send telemetry.
 - `upgrade` follows the version in the bundled registry; refresh the CLI to receive a newer catalog.
-- Authentication helpers and live API verification are planned.
+- The CLI references credential variable names but does not create provider tokens or store their
+  values; provider-side token setup remains explicit.
+- Packaged integration discovery is verified over stdio; `doctor` intentionally performs no live
+  provider call.

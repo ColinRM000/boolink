@@ -39,14 +39,20 @@ const githubTools = [
   ['github.get_authenticated_user', 'Confirm the identity attached to the local token.'],
   ['github.search_issues', 'Search issues with GitHub query syntax.'],
   ['github.get_issue', 'Retrieve a single issue and its normalized metadata.'],
+  ['github.list_issue_comments', 'Read an issue or pull-request conversation.'],
   ['github.list_pull_requests', 'List pull requests with branch and state filters.'],
+  ['github.get_pull_request', 'Retrieve one pull request and its branch metadata.'],
+  ['github.create_issue', 'Publish a reviewed repository issue.'],
+  ['github.update_issue', 'Change reviewed fields, labels, assignees, or state.'],
+  ['github.add_issue_comment', 'Publish a reviewed issue or pull-request comment.'],
+  ['github.create_pull_request', 'Open a pull request between pushed branches.'],
 ] as const;
 
 const integrations: readonly Integration[] = [
   {
     name: 'GitHub',
     description:
-      'A working, read-only MCP reference for issues, pull requests, and repository collaboration.',
+      'A complete local GitHub MVP for reading and carefully scoped issue and pull-request collaboration.',
     category: 'Development',
     status: 'Experimental',
     auth: 'Local GITHUB_TOKEN',
@@ -127,7 +133,7 @@ const roadmap = [
   [
     'GitHub reference',
     'Complete',
-    'Four read-only tools now validate the local-first architecture.',
+    'Ten read and write tools complete the scoped local-first GitHub MVP.',
   ],
   [
     'Registry + CLI',
@@ -429,7 +435,7 @@ export function App() {
                 <span className="terminal-cyan">◈</span> Credentials stay on this machine
                 <br />
                 <span className="terminal-green">✓</span> GitHub reference integration{' '}
-                <span className="terminal-muted">4 tools ready</span>
+                <span className="terminal-muted">10 tools ready</span>
               </code>
             </div>
           </div>
@@ -449,8 +455,8 @@ export function App() {
             <span>Foundation packages</span>
           </div>
           <div>
-            <strong>36</strong>
-            <span>Passing tests</span>
+            <strong>10</strong>
+            <span>GitHub MCP tools</span>
           </div>
           <div>
             <strong>0</strong>
@@ -496,17 +502,19 @@ export function App() {
                   <span className="integration-icon integration-icon-large">
                     <GitBranch size={30} aria-hidden="true" />
                   </span>
-                  <span className="status-chip status-experimental">Experimental · built</span>
+                  <span className="status-chip status-experimental">
+                    MVP complete · experimental
+                  </span>
                 </div>
                 <p className="integration-category">Reference integration</p>
-                <h3>GitHub MCP is ready for local testing.</h3>
+                <h3>GitHub MCP is complete for the scoped MVP.</h3>
                 <p>
                   The first real BooLink integration runs beside your AI client, talks directly to
                   GitHub, and keeps its token out of BooLink infrastructure.
                 </p>
                 <div className="feature-stats" aria-label="GitHub integration attributes">
                   <span>
-                    <strong>4</strong> read-only tools
+                    <strong>10</strong> tools
                   </span>
                   <span>
                     <strong>stdio</strong> local transport
@@ -521,7 +529,7 @@ export function App() {
                 <div className="toolbox-heading">
                   <span>Available MCP tools</span>
                   <span className="toolbox-readonly">
-                    <LockKeyhole size={13} /> Read only
+                    <ShieldCheck size={13} /> 6 read · 4 write
                   </span>
                 </div>
                 <ul>
@@ -588,7 +596,7 @@ export function App() {
         <section className="section cli-section" id="cli" data-scroll-section>
           <div className="section-heading" data-reveal="rise">
             <div>
-              <p className="kicker">CLI 0.2.0 · live on npm</p>
+              <p className="kicker">CLI 0.3.0 · GitHub MVP release</p>
               <h2>One command in. A complete local lifecycle after.</h2>
             </div>
             <p>
@@ -629,7 +637,7 @@ export function App() {
                   <i />
                 </span>
                 <span>boolink · local terminal</span>
-                <span className="cli-version">v0.2.0</span>
+                <span className="cli-version">v0.3.0</span>
               </div>
               <div className="cli-window-body">
                 <p>
@@ -639,7 +647,7 @@ export function App() {
                   <span className="terminal-cyan">◈ BooLink</span>
                   <strong>Choose an integration</strong>
                   <span>› GitHub</span>
-                  <small>4 read-only tools · local stdio</small>
+                  <small>10 scoped tools · local stdio</small>
                 </div>
                 <button
                   className="copy-button copy-button-primary"

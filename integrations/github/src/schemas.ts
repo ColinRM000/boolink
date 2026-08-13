@@ -67,6 +67,20 @@ export const searchIssuesResponseSchema = z
   })
   .loose();
 
+export const issueCommentResponseSchema = z
+  .object({
+    id: z.number().int().positive(),
+    html_url: z.url(),
+    body: z.string(),
+    user: userSummarySchema.nullable(),
+    created_at: z.iso.datetime({ offset: true }),
+    updated_at: z.iso.datetime({ offset: true }),
+    author_association: z.string(),
+  })
+  .loose();
+
+export const issueCommentListResponseSchema = z.array(issueCommentResponseSchema);
+
 const branchSchema = z
   .object({
     label: z.string(),
@@ -97,4 +111,5 @@ export const pullRequestListResponseSchema = z.array(pullRequestResponseSchema);
 
 export type AuthenticatedUserResponse = z.infer<typeof authenticatedUserResponseSchema>;
 export type IssueResponse = z.infer<typeof issueResponseSchema>;
+export type IssueCommentResponse = z.infer<typeof issueCommentResponseSchema>;
 export type PullRequestResponse = z.infer<typeof pullRequestResponseSchema>;

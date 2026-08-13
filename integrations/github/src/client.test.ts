@@ -66,6 +66,20 @@ const pullRequestResponse = {
   merged_at: null,
 };
 
+const commentResponse = {
+  id: 99,
+  html_url: 'https://github.com/boolink/boolink/issues/42#issuecomment-99',
+  body: 'A safe public comment.',
+  user: {
+    login: 'octocat',
+    id: 1,
+    html_url: 'https://github.com/octocat',
+  },
+  created_at: timestamp,
+  updated_at: timestamp,
+  author_association: 'OWNER',
+};
+
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(body), {
     status: 200,
@@ -96,9 +110,139 @@ describe('GitHub API client', () => {
       headers: {
         Accept: 'application/vnd.github+json',
         Authorization: `Bearer ${fakeToken}`,
-        'User-Agent': 'BooLink-GitHub/0.1.0',
+        'User-Agent': 'BooLink-GitHub/0.2.0',
         'X-GitHub-Api-Version': GITHUB_API_VERSION,
       },
+    });
+  });
+
+  it('constructs validated issue writes without leaking credentials into request bodies', async () => {
+    const requests: Array<{ url: string; init?: RequestInit }> = [];
+    const responses = [
+      jsonResponse(issueResponse, { status: 201 }),
+      jsonResponse({ ...issueResponse, state: 'closed', state_reason: 'completed' }),
+      jsonResponse(commentResponse, { status: 201 }),
+    ];
+    const client = createGitHubClient({
+      token: fakeToken,
+      fetchImpl: async (input, init) => {
+        requests.push({ url: String(input), ...(init === undefined ? {} : { init }) });
+        const response = responses.shift();
+        if (response === undefined) throw new Error('Unexpected request');
+        return response;
+      },
+    });
+
+    await expect(
+      client.createIssue({
+        owner: 'boolink',
+        repository: 'boolink',
+        title: 'Finish the GitHub MCP',
+        body: 'Implement the approved write slice.',
+        labels: ['enhancement'],
+        assignees: ['octocat'],
+      }),
+    ).resolves.toMatchObject({ number: 42, repository: 'boolink/boolink' });
+    await expect(
+      client.updateIssue({
+        owner: 'boolink',
+        repository: 'boolink',
+        issueNumber: 42,
+        state: 'closed',
+        stateReason: 'completed',
+        labels: [],
+      }),
+    ).resolves.toMatchObject({ state: 'closed', stateReason: 'completed' });
+    await expect(
+      client.addIssueComment({
+        owner: 'boolink',
+        repository: 'boolink',
+        issueNumber: 42,
+        body: 'A safe public comment.',
+      }),
+    ).resolves.toMatchObject({ id: 99, authorAssociation: 'OWNER' });
+
+    expect(requests.map(({ init }) => init?.method)).toEqual(['POST', 'PATCH', 'POST']);
+    expect(requests.map(({ url }) => new URL(url).pathname)).toEqual([
+      '/repos/boolink/boolink/issues',
+      '/repos/boolink/boolink/issues/42',
+      '/repos/boolink/boolink/issues/42/comments',
+    ]);
+    expect(JSON.parse(String(requests[0]?.init?.body))).toEqual({
+      title: 'Finish the GitHub MCP',
+      body: 'Implement the approved write slice.',
+      labels: ['enhancement'],
+      assignees: ['octocat'],
+    });
+    expect(JSON.parse(String(requests[1]?.init?.body))).toEqual({
+      state: 'closed',
+      state_reason: 'completed',
+      labels: [],
+    });
+    expect(JSON.stringify(requests.map(({ init }) => init?.body))).not.toContain(fakeToken);
+  });
+
+  it('lists comments and gets and creates pull requests with bounded contracts', async () => {
+    const requests: Array<{ url: string; init?: RequestInit }> = [];
+    const responses = [
+      jsonResponse([commentResponse], {
+        headers: { link: '<https://api.github.com/comments?page=2>; rel="next"' },
+      }),
+      jsonResponse(pullRequestResponse),
+      jsonResponse(pullRequestResponse, { status: 201 }),
+    ];
+    const client = createGitHubClient({
+      token: fakeToken,
+      fetchImpl: async (input, init) => {
+        requests.push({ url: String(input), ...(init === undefined ? {} : { init }) });
+        const response = responses.shift();
+        if (response === undefined) throw new Error('Unexpected request');
+        return response;
+      },
+    });
+
+    await expect(
+      client.listIssueComments({
+        owner: 'boolink',
+        repository: 'boolink',
+        issueNumber: 42,
+        page: 1,
+        perPage: 20,
+      }),
+    ).resolves.toMatchObject({
+      items: [{ id: 99 }],
+      pagination: { page: 1, perPage: 20, hasNextPage: true, nextPage: 2 },
+    });
+    await expect(
+      client.getPullRequest({
+        owner: 'boolink',
+        repository: 'boolink',
+        pullRequestNumber: 7,
+      }),
+    ).resolves.toMatchObject({ number: 7, repository: 'boolink/boolink' });
+    await expect(
+      client.createPullRequest({
+        owner: 'boolink',
+        repository: 'boolink',
+        title: 'Complete GitHub MCP',
+        head: 'feature/github',
+        base: 'main',
+        body: 'Adds the approved MVP tool set.',
+        draft: true,
+      }),
+    ).resolves.toMatchObject({ number: 7, draft: false });
+
+    expect(requests.map(({ url }) => new URL(url).pathname)).toEqual([
+      '/repos/boolink/boolink/issues/42/comments',
+      '/repos/boolink/boolink/pulls/7',
+      '/repos/boolink/boolink/pulls',
+    ]);
+    expect(JSON.parse(String(requests[2]?.init?.body))).toEqual({
+      title: 'Complete GitHub MCP',
+      head: 'feature/github',
+      base: 'main',
+      body: 'Adds the approved MVP tool set.',
+      draft: true,
     });
   });
 
@@ -226,6 +370,22 @@ describe('GitHub API client', () => {
       retryable: true,
     });
     expect(JSON.stringify(error)).not.toContain(fakeToken);
+  });
+
+  it('normalizes disabled repository features without exposing provider payloads', async () => {
+    const client = createGitHubClient({
+      token: fakeToken,
+      fetchImpl: async () =>
+        jsonResponse({ message: `Issues are disabled; diagnostic=${fakeToken}` }, { status: 410 }),
+    });
+
+    await expect(
+      client.createIssue({ owner: 'boolink', repository: 'boolink', title: 'Unavailable' }),
+    ).rejects.toMatchObject({
+      code: 'github_feature_disabled',
+      message: 'The requested GitHub feature is disabled or no longer available.',
+      retryable: false,
+    });
   });
 
   it('rejects malformed provider data with a stable safe error', async () => {

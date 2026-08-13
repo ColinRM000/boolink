@@ -3,17 +3,21 @@ import type * as z from 'zod/v4';
 
 import {
   authenticatedUserResponseSchema,
+  issueCommentListResponseSchema,
+  issueCommentResponseSchema,
   issueResponseSchema,
   pullRequestListResponseSchema,
+  pullRequestResponseSchema,
   searchIssuesResponseSchema,
   type AuthenticatedUserResponse,
+  type IssueCommentResponse,
   type IssueResponse,
   type PullRequestResponse,
 } from './schemas.js';
 
 export const GITHUB_API_VERSION = '2026-03-10';
 const DEFAULT_BASE_URL = 'https://api.github.com';
-const USER_AGENT = 'BooLink-GitHub/0.1.0';
+const USER_AGENT = 'BooLink-GitHub/0.2.0';
 
 export type GitHubFetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 
@@ -72,6 +76,16 @@ export type GitHubPullRequest = {
   mergedAt: string | null;
 };
 
+export type GitHubIssueComment = {
+  id: number;
+  url: string;
+  body: string;
+  author: string | null;
+  authorAssociation: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type GitHubViewer = {
   login: string;
   id: number;
@@ -105,6 +119,34 @@ export type GetIssueOptions = {
   signal?: AbortSignal;
 };
 
+export type ListIssueCommentsOptions = GetIssueOptions & {
+  page: number;
+  perPage: number;
+};
+
+export type CreateIssueOptions = {
+  owner: string;
+  repository: string;
+  title: string;
+  body?: string | undefined;
+  labels?: string[] | undefined;
+  assignees?: string[] | undefined;
+  signal?: AbortSignal;
+};
+
+export type UpdateIssueOptions = GetIssueOptions & {
+  title?: string | undefined;
+  body?: string | undefined;
+  state?: 'open' | 'closed' | undefined;
+  stateReason?: 'completed' | 'not_planned' | 'reopened' | undefined;
+  labels?: string[] | undefined;
+  assignees?: string[] | undefined;
+};
+
+export type AddIssueCommentOptions = GetIssueOptions & {
+  body: string;
+};
+
 export type ListPullRequestsOptions = {
   owner: string;
   repository: string;
@@ -118,6 +160,25 @@ export type ListPullRequestsOptions = {
   signal?: AbortSignal;
 };
 
+export type GetPullRequestOptions = {
+  owner: string;
+  repository: string;
+  pullRequestNumber: number;
+  signal?: AbortSignal;
+};
+
+export type CreatePullRequestOptions = {
+  owner: string;
+  repository: string;
+  title: string;
+  head: string;
+  base: string;
+  body?: string | undefined;
+  draft?: boolean | undefined;
+  maintainerCanModify?: boolean | undefined;
+  signal?: AbortSignal;
+};
+
 export type GitHubClient = {
   getAuthenticatedUser: (signal?: AbortSignal) => Promise<GitHubViewer>;
   searchIssues: (options: SearchIssuesOptions) => Promise<{
@@ -126,7 +187,13 @@ export type GitHubClient = {
     page: GitHubPage<GitHubIssue>;
   }>;
   getIssue: (options: GetIssueOptions) => Promise<GitHubIssue>;
+  listIssueComments: (options: ListIssueCommentsOptions) => Promise<GitHubPage<GitHubIssueComment>>;
+  createIssue: (options: CreateIssueOptions) => Promise<GitHubIssue>;
+  updateIssue: (options: UpdateIssueOptions) => Promise<GitHubIssue>;
+  addIssueComment: (options: AddIssueCommentOptions) => Promise<GitHubIssueComment>;
   listPullRequests: (options: ListPullRequestsOptions) => Promise<GitHubPage<GitHubPullRequest>>;
+  getPullRequest: (options: GetPullRequestOptions) => Promise<GitHubPullRequest>;
+  createPullRequest: (options: CreatePullRequestOptions) => Promise<GitHubPullRequest>;
 };
 
 type ClientOptions = {
@@ -139,6 +206,8 @@ type ClientOptions = {
 type RequestOptions<TSchema extends z.ZodType> = {
   path: string;
   schema: TSchema;
+  method?: 'GET' | 'POST' | 'PATCH';
+  body?: Record<string, unknown>;
   query?: Record<string, string | number | undefined>;
   signal?: AbortSignal;
 };
@@ -224,6 +293,13 @@ function errorForResponse(response: Response, now: number): BooLinkError {
     });
   }
 
+  if (response.status === 410) {
+    return new BooLinkError({
+      code: 'github_feature_disabled',
+      safeMessage: 'The requested GitHub feature is disabled or no longer available.',
+    });
+  }
+
   if (response.status === 422) {
     return new BooLinkError({
       code: 'github_invalid_request',
@@ -291,6 +367,18 @@ function mapPullRequest(pullRequest: PullRequestResponse, repository: string): G
   };
 }
 
+function mapIssueComment(comment: IssueCommentResponse): GitHubIssueComment {
+  return {
+    id: comment.id,
+    url: comment.html_url,
+    body: comment.body,
+    author: comment.user?.login ?? null,
+    authorAssociation: comment.author_association,
+    createdAt: comment.created_at,
+    updatedAt: comment.updated_at,
+  };
+}
+
 function mapViewer(user: AuthenticatedUserResponse): GitHubViewer {
   return {
     login: user.login,
@@ -324,15 +412,18 @@ export function createGitHubClient(options: ClientOptions): GitHubClient {
     }
 
     let response: Response;
+    const method = requestOptions.method ?? 'GET';
     try {
       response = await fetchImpl(url, {
-        method: 'GET',
+        method,
         headers: {
           Accept: 'application/vnd.github+json',
           Authorization: `Bearer ${options.token}`,
+          ...(requestOptions.body === undefined ? {} : { 'Content-Type': 'application/json' }),
           'User-Agent': USER_AGENT,
           'X-GitHub-Api-Version': GITHUB_API_VERSION,
         },
+        ...(requestOptions.body === undefined ? {} : { body: JSON.stringify(requestOptions.body) }),
         ...(requestOptions.signal === undefined ? {} : { signal: requestOptions.signal }),
       });
     } catch (error) {
@@ -434,6 +525,69 @@ export function createGitHubClient(options: ClientOptions): GitHubClient {
       return mapIssue(data, repository);
     },
 
+    async listIssueComments(commentOptions) {
+      const { data, headers } = await request({
+        path: `/repos/${encodeURIComponent(commentOptions.owner)}/${encodeURIComponent(commentOptions.repository)}/issues/${commentOptions.issueNumber}/comments`,
+        schema: issueCommentListResponseSchema,
+        query: { page: commentOptions.page, per_page: commentOptions.perPage },
+        ...(commentOptions.signal === undefined ? {} : { signal: commentOptions.signal }),
+      });
+      return {
+        items: data.map(mapIssueComment),
+        pagination: pagination(headers, commentOptions.page, commentOptions.perPage),
+        rateLimit: getRateLimit(headers),
+      };
+    },
+
+    async createIssue(issueOptions) {
+      const repository = `${issueOptions.owner}/${issueOptions.repository}`;
+      const { data } = await request({
+        path: `/repos/${encodeURIComponent(issueOptions.owner)}/${encodeURIComponent(issueOptions.repository)}/issues`,
+        method: 'POST',
+        schema: issueResponseSchema,
+        body: {
+          title: issueOptions.title,
+          ...(issueOptions.body === undefined ? {} : { body: issueOptions.body }),
+          ...(issueOptions.labels === undefined ? {} : { labels: issueOptions.labels }),
+          ...(issueOptions.assignees === undefined ? {} : { assignees: issueOptions.assignees }),
+        },
+        ...(issueOptions.signal === undefined ? {} : { signal: issueOptions.signal }),
+      });
+      return mapIssue(data, repository);
+    },
+
+    async updateIssue(issueOptions) {
+      const repository = `${issueOptions.owner}/${issueOptions.repository}`;
+      const { data } = await request({
+        path: `/repos/${encodeURIComponent(issueOptions.owner)}/${encodeURIComponent(issueOptions.repository)}/issues/${issueOptions.issueNumber}`,
+        method: 'PATCH',
+        schema: issueResponseSchema,
+        body: {
+          ...(issueOptions.title === undefined ? {} : { title: issueOptions.title }),
+          ...(issueOptions.body === undefined ? {} : { body: issueOptions.body }),
+          ...(issueOptions.state === undefined ? {} : { state: issueOptions.state }),
+          ...(issueOptions.stateReason === undefined
+            ? {}
+            : { state_reason: issueOptions.stateReason }),
+          ...(issueOptions.labels === undefined ? {} : { labels: issueOptions.labels }),
+          ...(issueOptions.assignees === undefined ? {} : { assignees: issueOptions.assignees }),
+        },
+        ...(issueOptions.signal === undefined ? {} : { signal: issueOptions.signal }),
+      });
+      return mapIssue(data, repository);
+    },
+
+    async addIssueComment(commentOptions) {
+      const { data } = await request({
+        path: `/repos/${encodeURIComponent(commentOptions.owner)}/${encodeURIComponent(commentOptions.repository)}/issues/${commentOptions.issueNumber}/comments`,
+        method: 'POST',
+        schema: issueCommentResponseSchema,
+        body: { body: commentOptions.body },
+        ...(commentOptions.signal === undefined ? {} : { signal: commentOptions.signal }),
+      });
+      return mapIssueComment(data);
+    },
+
     async listPullRequests(listOptions) {
       const repository = `${listOptions.owner}/${listOptions.repository}`;
       const { data, headers } = await request({
@@ -456,6 +610,37 @@ export function createGitHubClient(options: ClientOptions): GitHubClient {
         pagination: pagination(headers, listOptions.page, listOptions.perPage),
         rateLimit: getRateLimit(headers),
       };
+    },
+
+    async getPullRequest(pullRequestOptions) {
+      const repository = `${pullRequestOptions.owner}/${pullRequestOptions.repository}`;
+      const { data } = await request({
+        path: `/repos/${encodeURIComponent(pullRequestOptions.owner)}/${encodeURIComponent(pullRequestOptions.repository)}/pulls/${pullRequestOptions.pullRequestNumber}`,
+        schema: pullRequestResponseSchema,
+        ...(pullRequestOptions.signal === undefined ? {} : { signal: pullRequestOptions.signal }),
+      });
+      return mapPullRequest(data, repository);
+    },
+
+    async createPullRequest(pullRequestOptions) {
+      const repository = `${pullRequestOptions.owner}/${pullRequestOptions.repository}`;
+      const { data } = await request({
+        path: `/repos/${encodeURIComponent(pullRequestOptions.owner)}/${encodeURIComponent(pullRequestOptions.repository)}/pulls`,
+        method: 'POST',
+        schema: pullRequestResponseSchema,
+        body: {
+          title: pullRequestOptions.title,
+          head: pullRequestOptions.head,
+          base: pullRequestOptions.base,
+          ...(pullRequestOptions.body === undefined ? {} : { body: pullRequestOptions.body }),
+          ...(pullRequestOptions.draft === undefined ? {} : { draft: pullRequestOptions.draft }),
+          ...(pullRequestOptions.maintainerCanModify === undefined
+            ? {}
+            : { maintainer_can_modify: pullRequestOptions.maintainerCanModify }),
+        },
+        ...(pullRequestOptions.signal === undefined ? {} : { signal: pullRequestOptions.signal }),
+      });
+      return mapPullRequest(data, repository);
     },
   };
 }

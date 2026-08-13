@@ -41,7 +41,7 @@ describe('interactive integration shop', () => {
     expect(rendered).toContain('BooLink');
     expect(rendered).toContain('Integration Shop');
     expect(rendered).toContain('GitHub');
-    expect(rendered).toContain('4 tools');
+    expect(rendered).toContain('10 tools');
     expect(rendered).not.toContain(secret);
   });
 

@@ -6,6 +6,9 @@ import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
+import { Client } from '@modelcontextprotocol/client';
+import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
+
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const requestedOutput = process.argv[2] ?? 'release';
 const outputDirectory = path.resolve(repositoryRoot, requestedOutput);
@@ -16,21 +19,34 @@ if (!outputDirectory.startsWith(allowedPrefix) || outputDirectory === repository
 }
 
 const packages = [
-  { directory: 'packages/core', name: '@boolink-dev/core', required: ['package/dist/index.js'] },
-  { directory: 'packages/sdk', name: '@boolink-dev/sdk', required: ['package/dist/index.js'] },
+  {
+    directory: 'packages/core',
+    name: '@boolink-dev/core',
+    version: '0.1.0',
+    required: ['package/dist/index.js'],
+  },
+  {
+    directory: 'packages/sdk',
+    name: '@boolink-dev/sdk',
+    version: '0.1.0',
+    required: ['package/dist/index.js'],
+  },
   {
     directory: 'packages/registry',
     name: '@boolink-dev/registry',
+    version: '0.2.0',
     required: ['package/dist/index.js', 'package/src/catalog.json'],
   },
   {
     directory: 'integrations/github',
     name: '@boolink-dev/github',
+    version: '0.2.0',
     required: ['package/dist/index.js', 'package/dist/server.js'],
   },
   {
     directory: 'packages/cli',
     name: '@boolink-dev/cli',
+    version: '0.3.0',
     required: ['package/dist/index.js', 'package/dist/bin.js'],
   },
 ];
@@ -54,9 +70,11 @@ function run(command, args, options = {}) {
 }
 
 function runPnpm(args, options = {}) {
-  const pnpmEntry = process.env.npm_execpath;
-  if (!pnpmEntry) throw new Error('Run this script through pnpm so npm_execpath is available.');
-  return run(process.execPath, [pnpmEntry, ...args], options);
+  const command = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+  return run(command, ['--config.manage-package-manager-versions=false', ...args], {
+    ...(process.platform === 'win32' ? { shell: true } : {}),
+    ...options,
+  });
 }
 
 async function tarText(tarball, entry) {
@@ -87,7 +105,13 @@ const packedByName = new Map();
 for (const tarball of tarballs) {
   const manifest = JSON.parse(await tarText(tarball, 'package/package.json'));
   if (manifest.private === true) throw new Error(`${manifest.name} is still private.`);
-  if (manifest.version !== '0.1.0') throw new Error(`${manifest.name} has an unexpected version.`);
+  const releasePackage = packages.find(({ name }) => name === manifest.name);
+  if (!releasePackage) throw new Error(`Unexpected package in release: ${manifest.name}`);
+  if (manifest.version !== releasePackage.version) {
+    throw new Error(
+      `${manifest.name} has version ${manifest.version}; expected ${releasePackage.version}.`,
+    );
+  }
   const serializedDependencies = JSON.stringify(manifest.dependencies ?? {});
   if (serializedDependencies.includes('workspace:')) {
     throw new Error(`${manifest.name} contains an unpublished workspace dependency.`);
@@ -100,8 +124,6 @@ for (const tarball of tarballs) {
     if (!listing.includes(commonEntry))
       throw new Error(`${manifest.name} is missing ${commonEntry}.`);
   }
-  const releasePackage = packages.find(({ name }) => name === manifest.name);
-  if (!releasePackage) throw new Error(`Unexpected package in release: ${manifest.name}`);
   for (const requiredEntry of releasePackage.required) {
     if (!listing.includes(requiredEntry)) {
       throw new Error(`${manifest.name} is missing ${requiredEntry}.`);
@@ -125,6 +147,7 @@ if (!cliBin.startsWith('#!/usr/bin/env node')) {
 
 const smokeDirectory = await mkdtemp(path.join(os.tmpdir(), 'boolink-release-'));
 try {
+  const pnpmStoreDirectory = runPnpm(['store', 'path'], { capture: true }).trim();
   const smokeDependencies = Object.fromEntries(
     [...packedByName.entries()].map(([name, tarball]) => [
       name,
@@ -153,20 +176,71 @@ try {
     `packages:\n  - '.'\noverrides:\n${overrideLines.join('\n')}\n`,
     'utf8',
   );
-  runPnpm(['install', '--dir', smokeDirectory, '--ignore-scripts'], {
-    env: { ...process.env, CI: 'true' },
-  });
+  runPnpm(
+    [
+      'install',
+      '--dir',
+      smokeDirectory,
+      '--ignore-scripts',
+      '--store-dir',
+      path.dirname(pnpmStoreDirectory),
+    ],
+    {
+      env: { ...process.env, CI: 'true' },
+    },
+  );
 
   for (const executableName of ['boolink', 'boo']) {
     const searchOutput = runPnpm(
       ['--dir', smokeDirectory, 'exec', executableName, 'search', 'github'],
       { capture: true },
     );
-    if (!searchOutput.includes('github') || !searchOutput.includes('4 tools')) {
+    if (!searchOutput.includes('github') || !searchOutput.includes('10 tools')) {
       throw new Error(
         `The installed ${executableName} command could not discover the packaged GitHub integration.`,
       );
     }
+  }
+
+  const githubServer = path.join(
+    smokeDirectory,
+    'node_modules',
+    '@boolink-dev',
+    'github',
+    'dist',
+    'server.js',
+  );
+  const client = new Client(
+    { name: 'boolink-packed-release-smoke', version: '0.0.0' },
+    { versionNegotiation: { mode: 'auto' } },
+  );
+  const transport = new StdioClientTransport({
+    command: process.execPath,
+    args: [githubServer],
+    env: { ...process.env, GITHUB_TOKEN: 'github_pat_packaged_discovery_only' },
+    stderr: 'pipe',
+  });
+  try {
+    await client.connect(transport);
+    const listed = await client.listTools();
+    const toolNames = listed.tools.map(({ name }) => name).sort();
+    const expectedToolNames = [
+      'github.add_issue_comment',
+      'github.create_issue',
+      'github.create_pull_request',
+      'github.get_authenticated_user',
+      'github.get_issue',
+      'github.get_pull_request',
+      'github.list_issue_comments',
+      'github.list_pull_requests',
+      'github.search_issues',
+      'github.update_issue',
+    ];
+    if (JSON.stringify(toolNames) !== JSON.stringify(expectedToolNames)) {
+      throw new Error('The packed GitHub stdio server did not expose the expected 10-tool MVP.');
+    }
+  } finally {
+    await client.close();
   }
 } finally {
   await rm(smokeDirectory, { recursive: true, force: true });
@@ -186,9 +260,12 @@ await writeFile(
 );
 
 const releaseManifest = {
-  version: '0.1.0',
+  schemaVersion: 1,
   packages: Object.fromEntries(
-    [...packedByName.entries()].map(([name, tarball]) => [name, path.basename(tarball)]),
+    packages.map(({ name, version }) => [
+      name,
+      { version, tarball: path.basename(packedByName.get(name)) },
+    ]),
   ),
 };
 await writeFile(
