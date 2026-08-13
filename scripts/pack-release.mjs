@@ -52,7 +52,7 @@ const packages = [
   {
     directory: 'packages/cli',
     name: '@boolink-dev/cli',
-    version: '0.4.0',
+    version: '0.4.1',
     required: ['package/dist/index.js', 'package/dist/bin.js'],
   },
 ];
