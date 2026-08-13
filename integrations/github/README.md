@@ -160,6 +160,9 @@ Create a draft pull request after its commits have already been pushed:
 - Request/response contracts are mock-verified against GitHub's versioned official REST
   documentation. The release smoke test installs the packed package and negotiates all 10 tools
   through the official MCP stdio client without contacting GitHub.
+- `github.get_authenticated_user` was additionally verified against the live GitHub API with
+  `@boolink-dev/github@0.2.0` on 2026-08-13. The other nine tools remain contract-tested rather than
+  live-account tested.
 - The Codex adapter and neutral JSON launch document are the supported client configuration paths.
 
 ## Troubleshooting

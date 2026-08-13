@@ -9,7 +9,8 @@ drifted from current official documentation.
 - Use narrowly scoped maintainer-owned test credentials.
 - The script calls read-only tools only.
 - GitHub verification calls `github.get_authenticated_user`.
-- Cloudflare verification calls `cloudflare.verify_token` and requests at most one visible zone.
+- Cloudflare verification calls `cloudflare.verify_token` and requests the exact `boolink.dev` zone
+  with Cloudflare's documented minimum page size.
 - Provider response bodies, identities, account IDs, zone names, and credential values are never
   written to the verification record.
 - Sanitized records are written beneath ignored `work/live-verification/`; inspect them before
@@ -27,8 +28,24 @@ node scripts/verify-live-integrations.mjs --cloudflare
 ```
 
 Omit the flags to verify both. Missing credentials stop the script without printing their values.
-Provider failures are returned only as a generic failed check; the normal integration error
-normalization remains responsible for preventing sensitive response data from traversing MCP.
+Provider failures report only BooLink's normalized error code and safe message when available; the
+normal integration error normalization remains responsible for preventing sensitive response data
+from traversing MCP.
+
+## Recorded verification
+
+The ignored local records were inspected and contain no credentials, provider response bodies,
+identities, account identifiers, or resource names.
+
+| Provider   | Package                         | Verified (UTC)      | Live read-only checks                              |
+| ---------- | ------------------------------- | ------------------- | -------------------------------------------------- |
+| GitHub     | `@boolink-dev/github@0.2.0`     | 2026-08-13 21:27:18 | `github.get_authenticated_user`                    |
+| Cloudflare | `@boolink-dev/cloudflare@0.1.0` | 2026-08-13 23:14:57 | `cloudflare.verify_token`, `cloudflare.list_zones` |
+
+These records establish live compatibility only for the named read-only checks. All other tool
+contracts remain covered by mocked request, response, schema, pagination, MCP, error-normalization,
+capability, and credential-leakage tests; they have not been exercised against a maintainer's live
+provider account.
 
 Live verification does not authorize mutating test calls and is not a substitute for mocked request,
 schema, pagination, error-normalization, capability, and credential-leakage coverage.

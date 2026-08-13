@@ -145,6 +145,9 @@ Purge one exact asset after a deployment:
   purges remain outside the initial contract.
 - Contracts are mock-verified against Cloudflare's current official REST API documentation. Live
   compatibility depends on the selected token permissions and zone plan.
+- `cloudflare.verify_token` and `cloudflare.list_zones` were additionally verified against the live
+  Cloudflare API with `@boolink-dev/cloudflare@0.1.0` on 2026-08-13. The other eight tools remain
+  contract-tested rather than live-account tested.
 
 ## Troubleshooting
 

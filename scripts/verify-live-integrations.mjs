@@ -28,7 +28,10 @@ const configurations = {
     credential: 'CLOUDFLARE_API_TOKEN',
     checks: [
       { name: 'cloudflare.verify_token', arguments: {} },
-      { name: 'cloudflare.list_zones', arguments: { page: 1, perPage: 1 } },
+      {
+        name: 'cloudflare.list_zones',
+        arguments: { name: 'boolink.dev', page: 1, perPage: 5 },
+      },
     ],
   },
 };
@@ -52,6 +55,34 @@ function runtimeEnvironment(credential, token) {
     if (process.env[variable]) environment[variable] = process.env[variable];
   }
   return environment;
+}
+
+function normalizedErrorSummary(result) {
+  let error = result.structuredContent?.error;
+  if ((typeof error !== 'object' || error === null) && Array.isArray(result.content)) {
+    for (const item of result.content) {
+      if (item?.type !== 'text' || typeof item.text !== 'string') continue;
+      try {
+        const parsed = JSON.parse(item.text);
+        if (typeof parsed?.error === 'object' && parsed.error !== null) {
+          error = parsed.error;
+          break;
+        }
+      } catch {
+        // Only the integration's normalized JSON error envelope is eligible for reporting.
+      }
+    }
+  }
+  if (
+    typeof error !== 'object' ||
+    error === null ||
+    typeof error.code !== 'string' ||
+    typeof error.message !== 'string'
+  ) {
+    return 'normalized MCP error';
+  }
+
+  return `${error.code}: ${error.message}`;
 }
 
 for (const provider of selected) {
@@ -84,7 +115,7 @@ for (const provider of selected) {
     for (const check of configuration.checks) {
       const result = await client.callTool(check);
       if (result.isError === true) {
-        throw new Error(`${check.name} returned a normalized MCP error.`);
+        throw new Error(`${check.name} returned ${normalizedErrorSummary(result)}.`);
       }
     }
 
