@@ -20,9 +20,9 @@ pnpm install --frozen-lockfile
 pnpm release:pack
 ```
 
-`release:pack` runs the full repository checks, builds five npm tarballs in `release/`, validates
+`release:pack` runs the full repository checks, builds six npm tarballs in `release/`, validates
 their manifests and required files, installs the packed graph in a temporary project, exercises the
-installed CLI, negotiates the packed GitHub server over MCP stdio, and writes
+installed CLI, negotiates the packed GitHub and Cloudflare servers over MCP stdio, and writes
 `release/SHA256SUMS.txt` plus `release/release-manifest.json`. Package versions are independent and
 are recorded beside each tarball in the manifest.
 
@@ -33,7 +33,7 @@ Publish packages only from the validated tarballs, in dependency order:
 1. `@boolink-dev/core`
 2. `@boolink-dev/sdk`
 3. `@boolink-dev/registry`
-4. `@boolink-dev/github`
+4. `@boolink-dev/github` and `@boolink-dev/cloudflare` in either order
 5. `@boolink-dev/cli`
 
 Use the `tarball` fields recorded in `release/release-manifest.json`; scoped package tarball names do

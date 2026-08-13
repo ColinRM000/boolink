@@ -1,13 +1,13 @@
 {
-  "name": "@boolink-dev/cli",
-  "version": "0.4.0",
-  "description": "Local-first command-line interface for BooLink integrations.",
+  "name": "@boolink-dev/cloudflare",
+  "version": "0.1.0",
+  "description": "Local-first Cloudflare MCP integration for BooLink.",
   "license": "MIT",
-  "homepage": "https://boolink.dev",
+  "homepage": "https://boolink.dev/integrations/cloudflare",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ColinRM000/boolink.git",
-    "directory": "packages/cli"
+    "directory": "integrations/cloudflare"
   },
   "bugs": {
     "url": "https://github.com/ColinRM000/boolink/issues"
@@ -26,11 +26,11 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./server": "./dist/server.js"
   },
   "bin": {
-    "boolink": "./dist/bin.js",
-    "boo": "./dist/bin.js"
+    "boolink-cloudflare": "./dist/server.js"
   },
   "files": [
     "dist",
@@ -45,7 +45,10 @@
   },
   "dependencies": {
     "@boolink-dev/core": "workspace:^",
-    "@boolink-dev/registry": "workspace:^",
+    "@boolink-dev/sdk": "workspace:^",
     "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.0.0"
   }
 }

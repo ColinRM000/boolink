@@ -40,6 +40,7 @@ describe('interactive integration shop', () => {
 
     expect(rendered).toContain('BooLink');
     expect(rendered).toContain('Integration Shop');
+    expect(rendered).toContain('Cloudflare');
     expect(rendered).toContain('GitHub');
     expect(rendered).toContain('10 tools');
     expect(rendered).not.toContain(secret);
@@ -60,8 +61,8 @@ describe('interactive integration shop', () => {
     const rendered = renderShop(details, bundledRegistry, {}, '/users/octocat', false);
 
     expect(details.screen).toBe('details');
-    expect(rendered).toContain('github.get_authenticated_user');
-    expect(rendered).toContain('GITHUB_TOKEN ○ not detected');
+    expect(rendered).toContain('cloudflare.verify_token');
+    expect(rendered).toContain('CLOUDFLARE_API_TOKEN ○ not detected');
     expect(rendered).toContain('[read]');
   });
 
@@ -71,11 +72,11 @@ describe('interactive integration shop', () => {
     expect(beforeApproval.command).toBeUndefined();
 
     const approved = press(beforeApproval.state, 'y');
-    expect(approved.command).toEqual(['add', 'github', '--client', 'codex', '--yes']);
+    expect(approved.command).toEqual(['add', 'cloudflare', '--client', 'codex', '--yes']);
   });
 
   it('can install without changing a client configuration', () => {
     const approved = press(createShopState(), 'enter', 'i', 'down', 'enter', 'y');
-    expect(approved.command).toEqual(['add', 'github', '--yes']);
+    expect(approved.command).toEqual(['add', 'cloudflare', '--yes']);
   });
 });

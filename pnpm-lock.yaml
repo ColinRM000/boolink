@@ -64,6 +64,22 @@ importers:
         specifier: 4.120.0
         version: 4.120.0
 
+  integrations/cloudflare:
+    dependencies:
+      '@boolink-dev/core':
+        specifier: workspace:^
+        version: link:../../packages/core
+      '@boolink-dev/sdk':
+        specifier: workspace:^
+        version: link:../../packages/sdk
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@modelcontextprotocol/client':
+        specifier: 2.0.0
+        version: 2.0.0
+
   integrations/github:
     dependencies:
       '@boolink-dev/core':
@@ -107,6 +123,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@boolink-dev/cloudflare':
+        specifier: workspace:^
+        version: link:../../integrations/cloudflare
       '@boolink-dev/github':
         specifier: workspace:^
         version: link:../../integrations/github

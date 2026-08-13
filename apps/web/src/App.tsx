@@ -30,6 +30,7 @@ type Integration = {
   category: string;
   status: 'Available in beta' | 'Coming soon' | 'Community choice';
   auth: string;
+  toolCount?: number;
   icon?: LucideIcon;
   logo?: string;
   logoAlt?: string;
@@ -56,16 +57,18 @@ const integrations: readonly Integration[] = [
     category: 'Development',
     status: 'Available in beta',
     auth: 'Local GITHUB_TOKEN',
+    toolCount: 10,
     logo: '/images/providers/github.png',
     logoAlt: 'GitHub',
   },
   {
     name: 'Cloudflare',
     description:
-      'Give agents secure, local access to infrastructure visibility and common operations.',
+      'Inspect zones and DNS, manage DNS records, and purge cache through a tightly scoped local server.',
     category: 'Infrastructure',
-    status: 'Coming soon',
-    auth: 'Local API token',
+    status: 'Available in beta',
+    auth: 'Local CLOUDFLARE_API_TOKEN',
+    toolCount: 10,
     logo: '/images/providers/cloudflare.png',
     logoAlt: 'Cloudflare',
   },
@@ -144,8 +147,8 @@ const roadmap = [
   ],
   [
     'Cloudflare integration',
-    'In progress',
-    'Secure infrastructure tools are next on the integration catalog.',
+    'Available',
+    'Ten bounded tools for zones, DNS records, and cache purging are available today.',
   ],
   [
     'More integrations',
@@ -372,8 +375,7 @@ export function App() {
         </nav>
 
         <a className="header-status" href="#roadmap">
-          <span className="status-pulse" aria-hidden="true" />
-          GitHub available
+          <span className="status-pulse" aria-hidden="true" />2 integrations available
         </a>
       </header>
 
@@ -465,8 +467,8 @@ export function App() {
             <span>Runs beside your AI client</span>
           </div>
           <div>
-            <strong>10</strong>
-            <span>GitHub MCP tools</span>
+            <strong>20</strong>
+            <span>MCP tools across 2 integrations</span>
           </div>
           <div>
             <strong>0</strong>
@@ -605,6 +607,12 @@ export function App() {
                       <span>
                         <CircleDot size={15} aria-hidden="true" /> Explicit capabilities
                       </span>
+                      {integration.toolCount ? (
+                        <span>
+                          <PackageCheck size={15} aria-hidden="true" /> {integration.toolCount} MCP
+                          tools
+                        </span>
+                      ) : null}
                     </div>
                   </article>
                 );
@@ -616,7 +624,7 @@ export function App() {
         <section className="section cli-section" id="cli" data-scroll-section>
           <div className="section-heading" data-reveal="rise">
             <div>
-              <p className="kicker">Available on npm · CLI 0.3.0</p>
+              <p className="kicker">Available on npm · CLI 0.4.0</p>
               <h2>One command in. A complete local lifecycle after.</h2>
             </div>
             <p>
@@ -657,7 +665,7 @@ export function App() {
                   <i />
                 </span>
                 <span>boolink · local terminal</span>
-                <span className="cli-version">v0.3.0</span>
+                <span className="cli-version">v0.4.0</span>
               </div>
               <div className="cli-window-body">
                 <p>
@@ -668,6 +676,8 @@ export function App() {
                   <strong>Choose an integration</strong>
                   <span>› GitHub</span>
                   <small>6 read + 4 write tools · local stdio</small>
+                  <span>Cloudflare</span>
+                  <small>5 read + 5 DNS/cache tools · local stdio</small>
                 </div>
                 <button
                   className="copy-button copy-button-primary"
@@ -829,7 +839,7 @@ export function App() {
           <div className="section-heading" data-reveal="rise">
             <div>
               <p className="kicker">Available now and coming next</p>
-              <h2>Start with GitHub. Add more as BooLink grows.</h2>
+              <h2>Start with GitHub or Cloudflare. Add more as BooLink grows.</h2>
             </div>
             <p>
               BooLink prioritizes useful, well-documented integrations over a long catalog of thin
@@ -862,8 +872,8 @@ export function App() {
             <p className="kicker">Ready to connect</p>
             <h2>Give your AI useful tools without giving up control.</h2>
             <p>
-              Install BooLink, connect GitHub, and give your agent a clear, inspectable set of
-              capabilities—all running locally in your environment.
+              Install BooLink, connect GitHub or Cloudflare, and give your agent a clear,
+              inspectable set of capabilities—all running locally in your environment.
             </p>
           </div>
           <a className="button button-primary" href="#cli">
