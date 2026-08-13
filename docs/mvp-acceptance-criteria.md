@@ -22,8 +22,8 @@ The first meaningful BooLink release is accepted only when all criteria below ar
 
 - The registry is machine-readable, deterministic, schema-versioned, and contains only released
   entries.
-- `boo search`, `boo info`, `boo add`, `boo list`, and `boo doctor` work for the supported install and
-  client paths.
+- `boo search`, `boo info`, `boo add`, `boo remove`, `boo repair`, `boo upgrade`, `boo list`, and
+  `boo doctor` work for the supported install and client paths.
 - Installation and client configuration require explicit user action; an agent cannot silently
   grant itself software or credentials.
 

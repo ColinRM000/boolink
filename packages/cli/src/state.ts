@@ -1,5 +1,6 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { randomUUID } from 'node:crypto';
 
 import * as z from 'zod/v4';
 
@@ -10,7 +11,7 @@ const clientConfigurationSchema = z
   })
   .strict();
 
-const installationSchema = z
+const legacyInstallationSchema = z
   .object({
     id: z.string().min(1),
     packageName: z.string().min(1),
@@ -23,9 +24,20 @@ const installationSchema = z
   })
   .strict();
 
-export const installationStateSchema = z
+const legacyInstallationStateSchema = z
   .object({
     schemaVersion: z.literal(1),
+    integrations: z.array(legacyInstallationSchema),
+  })
+  .strict();
+
+const installationSchema = legacyInstallationSchema.extend({
+  installationDirectory: z.string().min(1).optional(),
+});
+
+export const installationStateSchema = z
+  .object({
+    schemaVersion: z.literal(2),
     integrations: z.array(installationSchema),
   })
   .strict();
@@ -34,7 +46,7 @@ export type InstallationState = z.infer<typeof installationStateSchema>;
 export type InstalledIntegration = z.infer<typeof installationSchema>;
 
 export function createEmptyState(): InstallationState {
-  return { schemaVersion: 1, integrations: [] };
+  return { schemaVersion: 2, integrations: [] };
 }
 
 export function getStatePath(boolinkHome: string): string {
@@ -50,7 +62,15 @@ export async function readInstallationState(filePath: string): Promise<Installat
     throw error;
   }
 
-  return installationStateSchema.parse(JSON.parse(text) as unknown);
+  const input = JSON.parse(text) as unknown;
+  const current = installationStateSchema.safeParse(input);
+  if (current.success) return current.data;
+
+  const legacy = legacyInstallationStateSchema.parse(input);
+  return {
+    schemaVersion: 2,
+    integrations: legacy.integrations,
+  };
 }
 
 export async function writeInstallationState(
@@ -59,8 +79,10 @@ export async function writeInstallationState(
 ): Promise<void> {
   const validated = installationStateSchema.parse(state);
   await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, `${JSON.stringify(validated, null, 2)}\n`, {
+  const temporary = `${filePath}.${randomUUID()}.tmp`;
+  await writeFile(temporary, `${JSON.stringify(validated, null, 2)}\n`, {
     encoding: 'utf8',
     mode: 0o600,
   });
+  await rename(temporary, filePath);
 }

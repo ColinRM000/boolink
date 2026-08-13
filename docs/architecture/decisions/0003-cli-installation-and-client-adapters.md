@@ -33,11 +33,11 @@ overwrite custom JSON output.
 - Make installation interactive-only: rejected because deterministic preview and approval flags are
   easier to test, automate, and audit.
 - Download packages during the first CLI slice: deferred until packages, integrity metadata, and
-  release channels exist.
+  release channels exist. ADR 0007 adopts durable downloads after the first publication.
 
 ## Consequences
 
-The CLI can exercise the full source-based install and configuration workflow in an isolated home
-without touching a developer's real settings. Package publication, integrity verification, removal,
-upgrades, and additional client adapters remain explicit later work. The public `add` contract must
-continue to preview writes and must not accept secrets as arguments.
+The CLI can exercise the source-based install and configuration workflow in an isolated home
+without touching a developer's real settings. ADR 0007 extends this to durable package installation,
+removal, repair, and upgrades. Additional client adapters remain explicit later work. The public
+`add` contract must continue to preview writes and must not accept secrets as arguments.

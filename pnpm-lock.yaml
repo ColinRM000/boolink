@@ -85,9 +85,6 @@ importers:
       '@boolink-dev/core':
         specifier: workspace:^
         version: link:../core
-      '@boolink-dev/github':
-        specifier: workspace:^
-        version: link:../../integrations/github
       '@boolink-dev/registry':
         specifier: workspace:^
         version: link:../registry

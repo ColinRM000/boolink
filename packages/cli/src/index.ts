@@ -1,12 +1,23 @@
 export {
   mergeCodexConfiguration,
   planClientConfiguration,
+  planClientConfigurationRemoval,
+  planClientConfigurationReplacement,
+  removeCodexConfiguration,
   renderCodexBlock,
   renderCustomJson,
+  restoreClientConfiguration,
   type ClientAdapter,
   type ClientConfigurationPlan,
   type ServerLaunch,
 } from './adapters.js';
+export {
+  getManagedInstallPaths,
+  installManagedPackage,
+  type ManagedInstallRequest,
+  type ManagedInstallResult,
+  type ManagedPackageInstaller,
+} from './installer.js';
 export { runCli, type CliContext } from './runner.js';
 export {
   createShopState,
