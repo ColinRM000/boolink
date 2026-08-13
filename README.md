@@ -50,6 +50,11 @@ Launch the experimental CLI from npm:
 npx @boolink-dev/cli
 ```
 
+First-time setup guides:
+
+- [Connect GitHub to Codex](docs/getting-started/github.md)
+- [Connect Cloudflare to Codex](docs/getting-started/cloudflare.md)
+
 Or build it locally to inspect either integration:
 
 ```bash

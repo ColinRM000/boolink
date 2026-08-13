@@ -24,6 +24,9 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { SetupGuide } from './SetupGuide.js';
+import type { SetupProvider } from './setup-guides.js';
+
 type Integration = {
   name: string;
   description: string;
@@ -186,6 +189,7 @@ const roadmap = [
 
 export function App() {
   const [query, setQuery] = useState('');
+  const [setupProvider, setSetupProvider] = useState<SetupProvider>('github');
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -373,6 +377,7 @@ export function App() {
         {[
           ['top', 'Intro'],
           ['integrations', 'Integrations'],
+          ['setup', 'Setup'],
           ['cli', 'CLI'],
           ['principles', 'Trust'],
           ['architecture', 'Architecture'],
@@ -396,6 +401,7 @@ export function App() {
 
         <nav aria-label="Main navigation">
           <a href="#integrations">Integrations</a>
+          <a href="#setup">Setup</a>
           <a href="#cli">CLI</a>
           <a href="#architecture">Architecture</a>
           <a href="#roadmap">What&apos;s next</a>
@@ -593,11 +599,22 @@ export function App() {
                     review every file change before approving an installation.
                   </p>
                 </div>
-                <pre aria-label={`${integration.name} integration shop command`}>
-                  <code>
-                    <span>$</span> npx @boolink-dev/cli
-                  </code>
-                </pre>
+                <div className="integration-quickstart-actions">
+                  <pre aria-label={`${integration.name} integration shop command`}>
+                    <code>
+                      <span>$</span> npx @boolink-dev/cli
+                    </code>
+                  </pre>
+                  <a
+                    className="integration-guide-link"
+                    href="#setup"
+                    onClick={() =>
+                      setSetupProvider(integration.name.toLowerCase() as SetupProvider)
+                    }
+                  >
+                    Open {integration.name} setup <ArrowRight size={15} aria-hidden="true" />
+                  </a>
+                </div>
               </div>
             </article>
           ))}
@@ -652,6 +669,8 @@ export function App() {
             </div>
           ) : null}
         </section>
+
+        <SetupGuide provider={setupProvider} onProviderChange={setSetupProvider} />
 
         <section className="section cli-section" id="cli" data-scroll-section>
           <div className="section-heading" data-reveal="rise">
