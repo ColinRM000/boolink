@@ -94,10 +94,14 @@ try {
       throw new Error(`Public CLI did not discover the ${integrationId} 10-tool integration.`);
     }
 
-    const outputPath = path.join(projectDirectory, `boolink-${integrationId}.json`);
+    const outputPath = path.join(
+      projectDirectory,
+      integrationId === 'github' ? '.claude.json' : `boolink-${integrationId}.json`,
+    );
+    const client = integrationId === 'github' ? 'claude-code' : 'custom-json';
     run(
       process.execPath,
-      [cli, 'add', integrationId, '--client', 'custom-json', '--output', outputPath, '--yes'],
+      [cli, 'add', integrationId, '--client', client, '--output', outputPath, '--yes'],
       { cwd: projectDirectory, env: cliEnvironment },
     );
 
@@ -110,6 +114,11 @@ try {
       const variableName = integrationId === 'github' ? 'GITHUB_TOKEN' : 'CLOUDFLARE_API_TOKEN';
       if (!generated.includes(variableName)) {
         throw new Error(`Generated ${integrationId} config is missing ${variableName}.`);
+      }
+      if (client === 'claude-code' && !generated.includes(`\${${variableName}}`)) {
+        throw new Error(
+          `Generated ${integrationId} Claude config is missing its environment reference.`,
+        );
       }
     } else {
       throw new Error(`Generated ${integrationId} config leaked a credential value.`);

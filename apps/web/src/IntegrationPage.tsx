@@ -47,6 +47,7 @@ function CopyCommand({ command, label }: { command: string; label: string }) {
 }
 
 export function IntegrationPage({ integration }: IntegrationPageProps) {
+  const [installClient, setInstallClient] = useState<'claude-code' | 'codex'>('codex');
   const guide = getSetupGuide(integration.id);
   const credential = primaryCredential(integration);
   const scopes = useMemo(
@@ -58,6 +59,7 @@ export function IntegrationPage({ integration }: IntegrationPageProps) {
   );
   const sourceUrl = `${integration.repositoryUrl}/tree/main/integrations/${integration.id}`;
   const setupUrl = `/?integration=${integration.id}#setup`;
+  const installCommand = `npx @boolink-dev/cli add ${integration.id} --client ${installClient}`;
 
   useEffect(() => {
     document.title = `${integration.name} MCP integration | BooLink`;
@@ -213,8 +215,26 @@ export function IntegrationPage({ integration }: IntegrationPageProps) {
             <div className="detail-install-card">
               <TerminalSquare size={22} aria-hidden="true" />
               <h3>Install with the BooLink CLI</h3>
-              <CopyCommand label="Preview write plan" command={guide.installPreview} />
-              <CopyCommand label="Apply after review" command={guide.installApply} />
+              <div className="platform-switch" role="group" aria-label="Choose AI client">
+                <button
+                  type="button"
+                  className={installClient === 'codex' ? 'is-active' : undefined}
+                  aria-pressed={installClient === 'codex'}
+                  onClick={() => setInstallClient('codex')}
+                >
+                  Codex
+                </button>
+                <button
+                  type="button"
+                  className={installClient === 'claude-code' ? 'is-active' : undefined}
+                  aria-pressed={installClient === 'claude-code'}
+                  onClick={() => setInstallClient('claude-code')}
+                >
+                  Claude Code
+                </button>
+              </div>
+              <CopyCommand label="Preview write plan" command={installCommand} />
+              <CopyCommand label="Apply after review" command={`${installCommand} --yes`} />
               <CopyCommand label="Diagnose locally" command="npx @boolink-dev/cli doctor" />
             </div>
 

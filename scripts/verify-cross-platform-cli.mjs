@@ -189,7 +189,7 @@ try {
     const exitCode = await cliModule.runCli(args, {
       environment: cliEnvironment,
       boolinkHome,
-      userHome: smokeDirectory,
+      userHome: outputDirectory,
       currentDirectory: consumerDirectory,
       nodeExecutable: process.execPath,
       installPackage: installCandidate,
@@ -213,38 +213,38 @@ try {
   }
 
   const configPaths = {
-    github: path.join(outputDirectory, 'github.json'),
+    github: path.join(outputDirectory, '.claude.json'),
     cloudflare: path.join(outputDirectory, 'cloudflare.json'),
   };
 
-  const preview = await boo([
-    'add',
-    'github',
-    '--client',
-    'custom-json',
-    '--output',
-    configPaths.github,
-  ]);
+  const preview = await boo(['add', 'github', '--client', 'claude-code']);
   expectIncludes(preview, 'Preview only. No files were changed.', 'GitHub install preview');
   if ((await exists(boolinkHome)) || (await exists(configPaths.github))) {
     throw new Error('The install preview changed the filesystem.');
   }
 
   for (const integrationId of ['github', 'cloudflare']) {
-    const installed = await boo([
-      'add',
-      integrationId,
-      '--client',
-      'custom-json',
-      '--output',
-      configPaths[integrationId],
-      '--yes',
-    ]);
+    const installed = await boo(
+      integrationId === 'github'
+        ? ['add', integrationId, '--client', 'claude-code', '--yes']
+        : [
+            'add',
+            integrationId,
+            '--client',
+            'custom-json',
+            '--output',
+            configPaths[integrationId],
+            '--yes',
+          ],
+    );
     expectIncludes(installed, 'installed locally.', `${integrationId} install`);
 
     const config = await readFile(configPaths[integrationId], 'utf8');
     const variableName = integrationId === 'github' ? 'GITHUB_TOKEN' : 'CLOUDFLARE_API_TOKEN';
     expectIncludes(config, variableName, `${integrationId} client configuration`);
+    if (integrationId === 'github') {
+      expectIncludes(config, `\${${variableName}}`, 'Claude Code environment reference');
+    }
   }
 
   const list = await boo(['list']);

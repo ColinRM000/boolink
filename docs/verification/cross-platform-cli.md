@@ -11,7 +11,7 @@ The test verifies:
 - registry search for GitHub and Cloudflare;
 - preview-only installation without filesystem changes;
 - managed installation of both candidate integration packages;
-- custom JSON client configuration without credential values;
+- Claude Code user-scope and custom JSON client configuration without credential values;
 - `list`, `doctor`, `repair`, and current-version `upgrade` behavior;
 - previewed and approved removal, including managed files and client configuration; and
 - an empty, valid installation state after cleanup.

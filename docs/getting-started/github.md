@@ -1,4 +1,4 @@
-# Connect GitHub to Codex with BooLink
+# Connect GitHub to Codex or Claude Code with BooLink
 
 This guide installs `@boolink-dev/github` as a local stdio MCP server. It covers the complete
 install-to-first-read path without sending a GitHub token to BooLink infrastructure.
@@ -42,26 +42,36 @@ read -rsp "GITHUB_TOKEN: " GITHUB_TOKEN; echo
 export GITHUB_TOKEN
 ```
 
-Restart Codex after changing a persistent environment variable. For a session-only variable, launch
-the client from the same environment or use its documented local secret mechanism.
+Restart the selected client after changing a persistent environment variable. For a session-only
+variable, launch the client from the same environment or use its documented local secret mechanism.
 
 ## 4. Preview and install
 
-First inspect the exact write plan:
+Choose a client and first inspect the exact write plan:
 
 ```bash
+# Codex
 npx @boolink-dev/cli add github --client codex
+
+# Claude Code
+npx @boolink-dev/cli add github --client claude-code
 ```
 
 After reviewing the package version, launcher, credential-variable name, and target configuration,
 apply that same plan:
 
 ```bash
+# Codex
 npx @boolink-dev/cli add github --client codex --yes
+
+# Claude Code
+npx @boolink-dev/cli add github --client claude-code --yes
 ```
 
-The CLI installs the catalog-pinned package under `~/.boolink` and writes a managed
-`[mcp_servers.boolink_github]` block to `~/.codex/config.toml`. It does not write the token value.
+The CLI installs the catalog-pinned package under `~/.boolink`. The Codex adapter writes a managed
+`[mcp_servers.boolink_github]` block to `~/.codex/config.toml`. The Claude Code adapter writes a
+private user-scoped `boolink_github` entry to `~/.claude.json`. Both record only the credential
+variable name; neither writes the token value.
 
 ## 5. Diagnose and verify read-only behavior
 
@@ -69,7 +79,7 @@ The CLI installs the catalog-pinned package under `~/.boolink` and writes a mana
 npx @boolink-dev/cli doctor
 ```
 
-Restart Codex, then use this first prompt:
+Restart the selected client, then use this first prompt:
 
 > Use `github.get_authenticated_user` to confirm the connected identity. Do not create or modify
 > anything.

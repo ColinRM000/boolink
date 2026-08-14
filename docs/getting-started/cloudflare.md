@@ -1,4 +1,4 @@
-# Connect Cloudflare to Codex with BooLink
+# Connect Cloudflare to Codex or Claude Code with BooLink
 
 This guide installs `@boolink-dev/cloudflare` as a local stdio MCP server. Start with read-only
 permissions; DNS changes and cache purges are administrative operations and should be added only
@@ -43,26 +43,36 @@ read -rsp "CLOUDFLARE_API_TOKEN: " CLOUDFLARE_API_TOKEN; echo
 export CLOUDFLARE_API_TOKEN
 ```
 
-Restart Codex after changing a persistent environment variable. For a session-only variable, launch
-the client from the same environment or use its documented local secret mechanism.
+Restart the selected client after changing a persistent environment variable. For a session-only
+variable, launch the client from the same environment or use its documented local secret mechanism.
 
 ## 4. Preview and install
 
-First inspect the exact write plan:
+Choose a client and first inspect the exact write plan:
 
 ```bash
+# Codex
 npx @boolink-dev/cli add cloudflare --client codex
+
+# Claude Code
+npx @boolink-dev/cli add cloudflare --client claude-code
 ```
 
 After reviewing the package version, launcher, credential-variable name, and target configuration,
 apply that same plan:
 
 ```bash
+# Codex
 npx @boolink-dev/cli add cloudflare --client codex --yes
+
+# Claude Code
+npx @boolink-dev/cli add cloudflare --client claude-code --yes
 ```
 
-The CLI installs the catalog-pinned package under `~/.boolink` and writes a managed
-`[mcp_servers.boolink_cloudflare]` block to `~/.codex/config.toml`. It does not write the token value.
+The CLI installs the catalog-pinned package under `~/.boolink`. The Codex adapter writes a managed
+`[mcp_servers.boolink_cloudflare]` block to `~/.codex/config.toml`. The Claude Code adapter writes a
+private user-scoped `boolink_cloudflare` entry to `~/.claude.json`. Both record only the credential
+variable name; neither writes the token value.
 
 ## 5. Diagnose and verify read-only behavior
 
@@ -70,7 +80,7 @@ The CLI installs the catalog-pinned package under `~/.boolink` and writes a mana
 npx @boolink-dev/cli doctor
 ```
 
-Restart Codex, then use this first prompt:
+Restart the selected client, then use this first prompt:
 
 > Use `cloudflare.verify_token`, then list the zones visible to the token. Do not change DNS or purge
 > cache.

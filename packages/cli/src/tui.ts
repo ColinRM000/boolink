@@ -6,7 +6,7 @@ import type { IntegrationManifest } from '@boolink-dev/core';
 import { bundledRegistry, searchRegistry, type RegistryDocument } from '@boolink-dev/registry';
 
 export type ShopScreen = 'catalog' | 'details' | 'client' | 'confirm';
-export type ShopClient = 'codex' | 'none';
+export type ShopClient = 'claude-code' | 'codex' | 'none';
 
 export type ShopState = {
   screen: ShopScreen;
@@ -38,6 +38,13 @@ const GREEN = '\u001B[92m';
 const YELLOW = '\u001B[93m';
 const MUTED = '\u001B[90m';
 const BOLD = '\u001B[1m';
+const SHOP_CLIENTS: readonly ShopClient[] = ['codex', 'claude-code', 'none'];
+
+function clientLabel(client: ShopClient): string {
+  if (client === 'codex') return 'Codex / ChatGPT desktop';
+  if (client === 'claude-code') return 'Claude Code';
+  return 'No client changes';
+}
 
 export function createShopState(): ShopState {
   return {
@@ -181,6 +188,11 @@ function renderClient(state: ShopState, useColor: boolean): string[] {
       detail: 'Add a local stdio server to the shared Codex config.toml.',
     },
     {
+      id: 'claude-code',
+      title: 'Claude Code',
+      detail: 'Add a private user-scoped stdio server to ~/.claude.json.',
+    },
+    {
       id: 'none',
       title: 'Integration only',
       detail: 'Record the local integration without changing a client configuration.',
@@ -213,7 +225,7 @@ function renderConfirm(
     color('Review installation', BOLD, useColor),
     '',
     `${color('Integration', MUTED, useColor)}   ${integration.name} v${integration.version}`,
-    `${color('Client', MUTED, useColor)}        ${state.client === 'codex' ? 'Codex / ChatGPT desktop' : 'No client changes'}`,
+    `${color('Client', MUTED, useColor)}        ${clientLabel(state.client)}`,
     `${color('Package', MUTED, useColor)}       ${integration.packageName}@${integration.version}`,
     `${color('Install path', MUTED, useColor)}  ${path.join(boolinkHome, 'integrations', integration.id, integration.version)}`,
     `${color('State file', MUTED, useColor)}    ${path.join(boolinkHome, 'installations.json')}`,
@@ -223,6 +235,8 @@ function renderConfirm(
     lines.push(
       `${color('Client file', MUTED, useColor)}   ${path.join(userHome, '.codex', 'config.toml')}`,
     );
+  } else if (state.client === 'claude-code') {
+    lines.push(`${color('Client file', MUTED, useColor)}   ${path.join(userHome, '.claude.json')}`);
   }
 
   lines.push(
@@ -317,7 +331,14 @@ export function updateShop(state: ShopState, key: string, registry: RegistryDocu
   if (state.screen === 'client') {
     if (key === 'b' || key === 'escape') return { state: { ...state, screen: 'details' } };
     if (key === 'up' || key === 'down') {
-      return { state: { ...state, client: state.client === 'codex' ? 'none' : 'codex' } };
+      const currentIndex = SHOP_CLIENTS.indexOf(state.client);
+      const offset = key === 'down' ? 1 : SHOP_CLIENTS.length - 1;
+      return {
+        state: {
+          ...state,
+          client: SHOP_CLIENTS[(currentIndex + offset) % SHOP_CLIENTS.length]!,
+        },
+      };
     }
     if (key === 'enter') return { state: { ...state, screen: 'confirm' } };
     return { state };
@@ -333,7 +354,7 @@ export function updateShop(state: ShopState, key: string, registry: RegistryDocu
         command: [
           'add',
           state.selectedIntegrationId,
-          ...(state.client === 'codex' ? ['--client', 'codex'] : []),
+          ...(state.client === 'none' ? [] : ['--client', state.client]),
           '--yes',
         ],
       };
