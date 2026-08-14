@@ -12,7 +12,7 @@ long-term product vision is finished.
 | 2. GitHub reference integration | Complete for scoped MVP       | Ten documented tools are published, contract-tested, discoverable over stdio, and live read-verified.                                                             |
 | 3. Registry                     | Complete for official catalog | Deterministic schema-validated catalog contains GitHub and Cloudflare. Status, tools, scopes, versions, authentication, and source URLs drive the public website. |
 | 4. CLI                          | Complete for MVP              | Search, info, add, list, doctor, repair, upgrade, and remove are implemented. The packed public journey runs on Windows, macOS, and Linux.                        |
-| 5. Website                      | MVP closure in progress       | Discovery and setup are live. Registry-backed provider routes are implemented; deployment and a clean published-client journey remain release gates.              |
+| 5. Website                      | Complete for MVP              | Registry-backed discovery, setup, and provider routes are live on `boolink.dev` and verified at desktop and mobile sizes.                                         |
 | 6. Additional integrations      | In progress                   | Cloudflare is complete for its scoped MVP. A third provider must be selected for architectural contrast.                                                          |
 | 7. Ecosystem preparation        | In progress                   | Contributor guidance, validation, CI security gates, Dependabot, and trusted publishing exist. Community templates and submission/verification governance remain. |
 
@@ -25,12 +25,20 @@ long-term product vision is finished.
 | Registry               | `0.3.1` | Official catalog     |
 | CLI                    | `0.4.2` | Pre-1.0 public CLI   |
 
-## Next release gate
+## v0.6.0 release evidence
 
-1. Pass `pnpm check` and the packed cross-platform CLI journey.
-2. Verify the registry-backed website at desktop and mobile sizes, including both integration URLs.
-3. Install through the public CLI into a clean supported client configuration and invoke a
+- GitHub PR `#17` passed repository checks, dependency review, dependency audit, secret scanning,
+  and the Windows, macOS, and Linux CLI journeys.
+- The trusted-publishing workflow published and publicly verified GitHub `0.2.1`, Cloudflare
+  `0.1.1`, registry `0.3.1`, and CLI `0.4.2` before creating the `v0.6.0` GitHub release.
+- Cloudflare Pages deployed merged commit `a4450c9` to production. The homepage and both direct
+  integration routes returned HTTP 200 and rendered their official versions and complete tool
+  surfaces.
+
+## Next phase gate
+
+1. Install through the public CLI into a clean supported client configuration and invoke a
    read-only provider tool through that client.
-4. Publish the patch package set, deploy the website, and record the release evidence.
-5. Select the third integration through an ADR based on architectural contrast rather than catalog
+2. Record sanitized client-journey evidence under `docs/verification`.
+3. Select the third integration through an ADR based on architectural contrast rather than catalog
    size.
