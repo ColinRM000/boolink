@@ -1,4 +1,4 @@
-# Connect GitHub to Codex or Claude Code with BooLink
+# Connect GitHub to Codex, Claude Code, or Claude Desktop with BooLink
 
 This guide installs `@boolink-dev/github` as a local stdio MCP server. It covers the complete
 install-to-first-read path without sending a GitHub token to BooLink infrastructure.
@@ -73,13 +73,24 @@ The CLI installs the catalog-pinned package under `~/.boolink`. The Codex adapte
 private user-scoped `boolink_github` entry to `~/.claude.json`. Both record only the credential
 variable name; neither writes the token value.
 
+### Claude Desktop one-click installation
+
+Claude Desktop users do not need the CLI or a separate Node.js installation. Download
+[`boolink-github-0.2.2.mcpb`](https://github.com/ColinRM000/boolink/releases/latest/download/boolink-github-0.2.2.mcpb),
+open the file with the current Claude Desktop app on Windows or macOS, and review its ten declared
+tools. Claude then displays a masked field for the GitHub token and supplies it only to the local
+BooLink server process.
+
+The matching GitHub release includes `SHA256SUMS.txt` for independent artifact verification. The
+bundle contains no token value and does not require step 3's environment variable.
+
 ## 5. Diagnose and verify read-only behavior
 
 ```bash
 npx @boolink-dev/cli doctor
 ```
 
-Restart the selected client, then use this first prompt:
+Restart the selected client if requested, then use this first prompt:
 
 > Use `github.get_authenticated_user` to confirm the connected identity. Do not create or modify
 > anything.

@@ -8,8 +8,9 @@ environment; the CLI records credential variable names, never credential values.
 - [GitHub](github.md) — issues, conversations, and pull requests.
 - [Cloudflare](cloudflare.md) — zones, DNS records, and cache purging.
 
-Both guides support Codex and Claude Code. For another stdio MCP client, generate a neutral launch
-document with `--client custom-json --output <path>`.
+Both guides support Codex, Claude Code, and one-click MCP Bundles for Claude Desktop. For another
+stdio MCP client, generate a neutral launch document with
+`--client custom-json --output <path>`.
 
 ## Safety model
 

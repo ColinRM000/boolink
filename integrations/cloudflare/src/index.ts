@@ -197,7 +197,7 @@ export const cloudflareManifest: IntegrationManifest = {
   name: 'Cloudflare',
   description:
     'Connect AI agents to Cloudflare zones, DNS records, and cache operations through a local MCP server.',
-  version: '0.1.1',
+  version: '0.1.2',
   provider: 'Cloudflare',
   category: 'infrastructure',
   packageName: '@boolink-dev/cloudflare',

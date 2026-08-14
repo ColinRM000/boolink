@@ -17,7 +17,7 @@ import {
 
 export const GITHUB_API_VERSION = '2026-03-10';
 const DEFAULT_BASE_URL = 'https://api.github.com';
-const USER_AGENT = 'BooLink-GitHub/0.2.1';
+const USER_AGENT = 'BooLink-GitHub/0.2.2';
 
 export type GitHubFetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 

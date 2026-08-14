@@ -61,6 +61,7 @@ jobs:
             gh release create "$RELEASE_TAG" --verify-tag --title "BooLink $RELEASE_TAG" --generate-notes
           fi
           gh release upload "$RELEASE_TAG" \
+            release/*.mcpb \
             release/*.tgz \
             release/SHA256SUMS.txt \
             release/release-manifest.json \

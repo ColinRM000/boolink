@@ -4,7 +4,7 @@ Local-first Cloudflare MCP integration for BooLink. It runs beside the user's AI
 directly to Cloudflare's API. BooLink infrastructure never receives, proxies, stores, or logs the
 configured API token.
 
-Version 0.1.1 is the official initial Cloudflare integration: five bounded read tools and five
+Version 0.1.2 is the official initial Cloudflare integration: five bounded read tools and five
 deliberately scoped DNS/cache operations. “Complete” means this supported surface is implemented,
 packaged, tested, and documented; it does not imply coverage of every Cloudflare product or API.
 
@@ -41,7 +41,7 @@ agent should access, then grant only the permissions needed for the intended too
 Cloudflare documents token creation and resource scoping in its
 [API token guide](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/).
 
-## Install and configure Codex
+## Install with Codex or Claude Code
 
 Requires Node.js 22 or newer. Set the token locally, then open the BooLink integration shop:
 
@@ -55,15 +55,16 @@ export CLOUDFLARE_API_TOKEN="your-scoped-api-token"
 npx @boolink-dev/cli
 ```
 
-Choose **Cloudflare**, **Install**, and **Codex**, review the exact changes, then approve them. The
-equivalent non-interactive command is:
+Choose **Cloudflare**, **Install**, and either **Codex** or **Claude Code**, review the exact changes,
+then approve them. The equivalent non-interactive commands are:
 
 ```bash
 npx @boolink-dev/cli add cloudflare --client codex --yes
+npx @boolink-dev/cli add cloudflare --client claude-code --yes
 ```
 
-Restart Codex after installation, then verify the managed package, launcher, client configuration,
-and credential presence:
+Restart the selected client after installation, then verify the managed package, launcher, client
+configuration, and credential presence:
 
 ```bash
 npx @boolink-dev/cli doctor
@@ -71,6 +72,15 @@ npx @boolink-dev/cli doctor
 
 The CLI references only the `CLOUDFLARE_API_TOKEN` variable name in client configuration. It never
 writes the token value.
+
+## Install with Claude Desktop
+
+Download the versioned
+[`boolink-cloudflare-0.1.2.mcpb`](https://github.com/ColinRM000/boolink/releases/latest/download/boolink-cloudflare-0.1.2.mcpb)
+release asset and open it with the current Claude Desktop app on Windows or macOS. Review the ten
+declared tools, approve the local extension, and enter the scoped API token in Claude's masked
+credential field. Claude supplies it only to the local server process; the archive contains no
+credential value. The release's `SHA256SUMS.txt` covers the bundle.
 
 ## Other MCP clients
 
@@ -147,8 +157,9 @@ Purge one exact asset after a deployment:
   compatibility depends on the selected token permissions and zone plan.
 - `cloudflare.verify_token` and `cloudflare.list_zones` were additionally verified against the live
   Cloudflare API with `@boolink-dev/cloudflare@0.1.0` on 2026-08-13. The other eight tools remain
-  contract-tested rather than live-account tested. Version 0.1.1 changes release metadata and the
-  package user-agent only; the verified provider request and response implementation is unchanged.
+  contract-tested rather than live-account tested. Version 0.1.2 adds Claude Desktop bundle
+  distribution metadata and updates the package user-agent only; the verified provider request and
+  response implementation is unchanged.
 
 ## Troubleshooting
 

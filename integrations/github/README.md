@@ -4,7 +4,7 @@ Local-first GitHub MCP integration for BooLink. It runs in the user's environmen
 directly with GitHub's REST API. BooLink infrastructure does not receive, proxy, persist, or log the
 configured credential.
 
-Version 0.2.1 is BooLink's official GitHub MVP: six bounded read tools and four deliberately scoped
+Version 0.2.2 is BooLink's official GitHub MVP: six bounded read tools and four deliberately scoped
 issue and pull-request write tools. “Complete” means the supported surface below is implemented,
 packaged, tested, and documented; it does not imply coverage of every GitHub API.
 
@@ -44,10 +44,10 @@ token so its identity and behavior remain explicit. GitHub documents endpoint pe
 [REST API documentation](https://docs.github.com/en/rest). The client pins
 `X-GitHub-Api-Version` to `2026-03-10`.
 
-## Install and configure Codex
+## Install with Codex or Claude Code
 
-Requires Node.js 22 or newer. Set `GITHUB_TOKEN` in the environment that launches Codex, then run
-the BooLink shop:
+Requires Node.js 22 or newer. Set `GITHUB_TOKEN` in the environment that launches the selected
+client, then run the BooLink shop:
 
 ```powershell
 $env:GITHUB_TOKEN = "your-fine-grained-token"
@@ -59,15 +59,16 @@ export GITHUB_TOKEN="your-fine-grained-token"
 npx @boolink-dev/cli
 ```
 
-Choose **GitHub**, **Install**, and **Codex**, review the proposed changes, then approve them. The
-equivalent non-interactive command is:
+Choose **GitHub**, **Install**, and either **Codex** or **Claude Code**, review the proposed changes,
+then approve them. The equivalent non-interactive commands are:
 
 ```bash
 npx @boolink-dev/cli add github --client codex --yes
+npx @boolink-dev/cli add github --client claude-code --yes
 ```
 
-Restart Codex after installation so it reloads the MCP configuration. Confirm the local package,
-launcher, configuration, and credential presence with:
+Restart the selected client after installation so it reloads the MCP configuration. Confirm the
+local package, launcher, configuration, and credential presence with:
 
 ```bash
 npx @boolink-dev/cli doctor
@@ -77,7 +78,16 @@ The CLI installs the exact catalog version beneath `~/.boolink`, writes a manage
 `[mcp_servers.boolink_github]` block to `~/.codex/config.toml`, and references only the environment
 variable name. It never writes the token value. If Codex was launched outside the shell where the
 token was set, configure `GITHUB_TOKEN` through your normal local environment/secret mechanism and
-restart Codex.
+restart the selected client.
+
+## Install with Claude Desktop
+
+Download the versioned
+[`boolink-github-0.2.2.mcpb`](https://github.com/ColinRM000/boolink/releases/latest/download/boolink-github-0.2.2.mcpb)
+release asset and open it with the current Claude Desktop app on Windows or macOS. Review the ten
+declared tools, approve the local extension, and enter the fine-grained token in Claude's masked
+credential field. Claude supplies it only to the local server process; the archive contains no
+credential value. The release's `SHA256SUMS.txt` covers the bundle.
 
 ## Other MCP clients
 
@@ -162,9 +172,11 @@ Create a draft pull request after its commits have already been pushed:
   through the official MCP stdio client without contacting GitHub.
 - `github.get_authenticated_user` was additionally verified against the live GitHub API with
   `@boolink-dev/github@0.2.0` on 2026-08-13. The other nine tools remain contract-tested rather than
-  live-account tested. Version 0.2.1 changes release metadata and the package user-agent only; the
-  verified provider request and response implementation is unchanged.
-- The Codex adapter and neutral JSON launch document are the supported client configuration paths.
+  live-account tested. Version 0.2.2 adds Claude Desktop bundle distribution metadata and updates
+  the package user-agent only; the verified provider request and response implementation is
+  unchanged.
+- Codex and Claude Code use the CLI adapters. Claude Desktop uses the versioned MCP Bundle. Other
+  local stdio clients can consume the neutral JSON launch document.
 
 ## Troubleshooting
 

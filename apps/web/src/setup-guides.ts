@@ -11,6 +11,7 @@ export type SetupGuide = {
   tokenLabel: string;
   tokenUrl: string;
   documentationUrl: string;
+  desktopDownloadUrl: string;
   permissions: readonly string[];
   firstPrompt: string;
 };
@@ -56,6 +57,7 @@ export const setupGuides: readonly SetupGuide[] = integrations.map((integration)
     tokenLabel: setupPresentation[integration.id].tokenLabel,
     tokenUrl,
     documentationUrl: integrationPath(integration.id),
+    desktopDownloadUrl: `${integration.repositoryUrl}/releases/latest/download/boolink-${integration.id}-${integration.version}.mcpb`,
     permissions: setupPresentation[integration.id].permissions,
     firstPrompt: setupPresentation[integration.id].firstPrompt,
   };

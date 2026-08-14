@@ -1570,6 +1570,17 @@ h2 {
   text-underline-offset: 0.2rem;
 }
 
+.setup-step-content > .setup-download,
+.setup-panel-orange .setup-step-content > .setup-download {
+  margin-top: 0.35rem;
+  color: #06131a;
+  font-size: 0.72rem;
+}
+
+.setup-step-content > .setup-download:hover {
+  text-decoration: none;
+}
+
 .platform-switch {
   width: fit-content;
   margin-bottom: 0.6rem;
@@ -3415,6 +3426,28 @@ footer .brand-mark {
 
 .detail-command button:hover {
   border-color: rgba(var(--detail-accent-rgb), 0.4);
+}
+
+.desktop-download-panel {
+  padding: 1rem;
+  display: grid;
+  justify-items: start;
+  gap: 0.85rem;
+  border: 1px solid rgba(var(--detail-accent-rgb), 0.18);
+  border-radius: 0.8rem;
+  background: rgba(var(--detail-accent-rgb), 0.045);
+}
+
+.desktop-download-panel p {
+  margin: 0;
+  color: #9ba7c3;
+  font-size: 0.74rem;
+  line-height: 1.6;
+}
+
+.desktop-download-panel small {
+  color: #65728e;
+  font-size: 0.61rem;
 }
 
 .detail-resources {

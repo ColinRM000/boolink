@@ -20,11 +20,12 @@ pnpm install --frozen-lockfile
 pnpm release:pack
 ```
 
-`release:pack` runs the full repository checks, builds six npm tarballs in `release/`, validates
-their manifests and required files, installs the packed graph in a temporary project, exercises the
-installed CLI, negotiates the packed GitHub and Cloudflare servers over MCP stdio, and writes
-`release/SHA256SUMS.txt` plus `release/release-manifest.json`. Package versions are independent and
-are recorded beside each tarball in the manifest.
+`release:pack` runs the full repository checks, builds six npm tarballs and two Claude Desktop MCP
+Bundles in `release/`, validates their manifests and required files, installs the packed graph in a
+temporary project, exercises the installed CLI, and negotiates every packed GitHub and Cloudflare
+server over MCP stdio. It writes `release/SHA256SUMS.txt` plus
+`release/release-manifest.json`. Package and bundle versions are independent and recorded beside
+each artifact in the manifest.
 
 ## Publication order
 
@@ -40,8 +41,9 @@ Use the `tarball` fields recorded in `release/release-manifest.json`; scoped pac
 not preserve the scope text. Never select an artifact by a loose filename pattern. Packages already
 published at the recorded version do not need to be republished.
 
-After publication, verify `npx @boolink-dev/cli` in a clean environment, attach checksums to the matching
-source release, and update the website only after the install path succeeds publicly.
+After publication, verify `npx @boolink-dev/cli` in a clean environment, attach the validated
+`.mcpb` files and checksums to the matching source release, and update the website only after the
+install and download paths succeed publicly.
 
 ## Trusted publishing configuration
 
@@ -69,9 +71,10 @@ provenance attestations automatically for these public packages and this public 
 1. Merge reviewed version and changelog changes to `main`.
 2. Create and push a semantic tag such as `v0.5.0` from that exact commit.
 3. Tag protection should restrict that operation to maintainers.
-4. The release workflow rebuilds and validates all tarballs, skips package versions that already
-   exist on npm, publishes only missing versions in dependency order, verifies the public install
-   path in an isolated temporary environment, then creates the GitHub release and uploads checksums.
+4. The release workflow rebuilds and validates all tarballs and MCP Bundles, skips package versions
+   that already exist on npm, publishes only missing versions in dependency order, verifies the
+   public install path in an isolated temporary environment, then creates the GitHub release and
+   uploads every artifact plus checksums.
 
 The workflow is safe to rerun: npm versions already present in the registry are never republished.
 The `workflow_dispatch` path accepts an existing semantic tag when a failed run needs to be retried.

@@ -26,7 +26,7 @@ describe('Cloudflare integration', () => {
       'cloudflare.purge_cache_urls',
       'cloudflare.purge_everything',
     ]);
-    expect(cloudflareManifest.version).toBe('0.1.1');
+    expect(cloudflareManifest.version).toBe('0.1.2');
     expect(cloudflareManifest.verification).toBe('official');
     expect(
       cloudflareManifest.tools.find(({ name }) => name === 'cloudflare.delete_dns_record'),

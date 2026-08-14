@@ -110,7 +110,7 @@ describe('GitHub API client', () => {
       headers: {
         Accept: 'application/vnd.github+json',
         Authorization: `Bearer ${fakeToken}`,
-        'User-Agent': 'BooLink-GitHub/0.2.1',
+        'User-Agent': 'BooLink-GitHub/0.2.2',
         'X-GitHub-Api-Version': GITHUB_API_VERSION,
       },
     });
