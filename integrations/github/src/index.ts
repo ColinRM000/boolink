@@ -183,13 +183,13 @@ export const githubManifest: IntegrationManifest = {
   name: 'GitHub',
   description:
     'Connect AI agents to GitHub repositories, issues, and pull requests through a local MCP server.',
-  version: '0.2.0',
+  version: '0.2.1',
   provider: 'GitHub',
   category: 'development',
   packageName: '@boolink-dev/github',
   repositoryUrl: 'https://github.com/ColinRM000/boolink',
   documentationUrl: 'https://boolink.dev/integrations/github',
-  verification: 'experimental',
+  verification: 'official',
   authentication: {
     type: 'bearer-token',
     instructionsUrl:

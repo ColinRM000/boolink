@@ -1,14 +1,16 @@
 # Cross-platform CLI journey
 
-The cross-platform journey test installs the packed CLI into a temporary consumer and exercises the
-same local lifecycle a new user follows. GitHub Actions runs it on Windows, macOS, and Linux with
-the minimum supported Node.js major version.
+The cross-platform journey test packs the CLI, registry, GitHub, and Cloudflare release candidates
+into a temporary consumer and exercises the same local lifecycle a new user follows. Local artifact
+overrides keep the pre-publish gate independent from npm availability; the normal installer still
+validates each package's published name, expected version, and safe server export. GitHub Actions
+runs the journey on Windows, macOS, and Linux with the minimum supported Node.js major version.
 
 The test verifies:
 
 - registry search for GitHub and Cloudflare;
 - preview-only installation without filesystem changes;
-- managed installation of both public integration packages;
+- managed installation of both candidate integration packages;
 - custom JSON client configuration without credential values;
 - `list`, `doctor`, `repair`, and current-version `upgrade` behavior;
 - previewed and approved removal, including managed files and client configuration; and

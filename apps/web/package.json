@@ -15,6 +15,7 @@
     "wrangler:check": "wrangler pages deployment list --project-name boolink"
   },
   "dependencies": {
+    "@boolink-dev/registry": "workspace:^",
     "lucide-react": "1.31.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"

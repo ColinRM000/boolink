@@ -1,4 +1,6 @@
-export type SetupProvider = 'github' | 'cloudflare';
+import { integrationPath, integrations, primaryCredential, type IntegrationId } from './catalog.js';
+
+export type SetupProvider = IntegrationId;
 
 export type SetupGuide = {
   id: SetupProvider;
@@ -15,48 +17,53 @@ export type SetupGuide = {
   firstPrompt: string;
 };
 
-export const setupGuides: readonly SetupGuide[] = [
-  {
-    id: 'github',
-    name: 'GitHub',
-    logo: '/images/providers/github.png',
-    accent: 'cyan',
-    tokenName: 'GITHUB_TOKEN',
+const setupPresentation = {
+  github: {
     tokenLabel: 'fine-grained personal access token',
-    tokenUrl: 'https://github.com/settings/personal-access-tokens/new',
-    documentationUrl:
-      'https://github.com/ColinRM000/boolink/blob/main/integrations/github/README.md',
     permissions: [
       'Repository access: only the repositories the agent needs',
       'Issues: read, or write for issue/comment tools',
       'Pull requests: read, or write for PR creation',
     ],
-    installPreview: 'npx @boolink-dev/cli add github --client codex',
-    installApply: 'npx @boolink-dev/cli add github --client codex --yes',
     firstPrompt:
       'Use github.get_authenticated_user to confirm the connected identity. Do not create or modify anything.',
   },
-  {
-    id: 'cloudflare',
-    name: 'Cloudflare',
-    logo: '/images/providers/cloudflare.png',
-    accent: 'orange',
-    tokenName: 'CLOUDFLARE_API_TOKEN',
+  cloudflare: {
     tokenLabel: 'scoped API token',
-    tokenUrl: 'https://dash.cloudflare.com/profile/api-tokens',
-    documentationUrl:
-      'https://github.com/ColinRM000/boolink/blob/main/integrations/cloudflare/README.md',
     permissions: [
       'Resources: only the account and zones the agent needs',
       'Zone and DNS: read for inspection',
       'DNS: write and Cache Purge only when those tools are needed',
     ],
-    installPreview: 'npx @boolink-dev/cli add cloudflare --client codex',
-    installApply: 'npx @boolink-dev/cli add cloudflare --client codex --yes',
     firstPrompt:
       'Use cloudflare.verify_token, then list the zones visible to the token. Do not change DNS or purge cache.',
   },
-] as const;
+} as const;
+
+export const setupGuides: readonly SetupGuide[] = integrations.map((integration) => {
+  const credential = primaryCredential(integration);
+  const tokenName = credential.environmentVariables?.[0];
+  const tokenUrl = integration.authentication.instructionsUrl;
+
+  if (!tokenName || !tokenUrl) {
+    throw new Error(`Website setup data is incomplete for integration "${integration.id}".`);
+  }
+
+  return {
+    id: integration.id,
+    name: integration.name,
+    logo: integration.logo,
+    accent: integration.accent,
+    tokenName,
+    tokenLabel: setupPresentation[integration.id].tokenLabel,
+    tokenUrl,
+    documentationUrl: integrationPath(integration.id),
+    permissions: setupPresentation[integration.id].permissions,
+    installPreview: `npx @boolink-dev/cli add ${integration.id} --client codex`,
+    installApply: `npx @boolink-dev/cli add ${integration.id} --client codex --yes`,
+    firstPrompt: setupPresentation[integration.id].firstPrompt,
+  };
+});
 
 export function getSetupGuide(provider: SetupProvider): SetupGuide {
   return setupGuides.find((guide) => guide.id === provider) ?? setupGuides[0]!;

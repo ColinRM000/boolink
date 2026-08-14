@@ -84,7 +84,7 @@ written atomically, with rollback around installation and configuration failures
 
 ## Current limitations
 
-- The CLI is experimental and its public API may change before 1.0.
+- The CLI is pre-1.0 and its public API may change before 1.0.
 - GitHub and Cloudflare are the two official catalog entries and server packages.
 - The Codex adapter and neutral JSON output are the first supported client paths.
 - `doctor` performs local diagnostics only. It does not call providers or send telemetry.

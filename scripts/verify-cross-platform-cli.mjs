@@ -4,11 +4,16 @@ import { access, mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:f
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const cliDirectory = path.join(repositoryRoot, 'packages', 'cli');
 const pnpmCommand = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+const releasePackages = [
+  { name: '@boolink-dev/registry', directory: 'packages/registry' },
+  { name: '@boolink-dev/cli', directory: 'packages/cli' },
+  { name: '@boolink-dev/github', directory: 'integrations/github' },
+  { name: '@boolink-dev/cloudflare', directory: 'integrations/cloudflare' },
+];
 const fakeSecrets = {
   GITHUB_TOKEN: 'github_pat_cross_platform_secret_marker',
   CLOUDFLARE_API_TOKEN: 'cloudflare_cross_platform_secret_marker',
@@ -84,17 +89,55 @@ try {
   await mkdir(consumerDirectory, { recursive: true });
   await mkdir(outputDirectory, { recursive: true });
 
-  run(pnpmCommand, ['pack', '--pack-destination', packDirectory], { cwd: cliDirectory });
+  for (const releasePackage of releasePackages) {
+    run(pnpmCommand, ['pack', '--pack-destination', packDirectory], {
+      cwd: path.join(repositoryRoot, releasePackage.directory),
+    });
+  }
   const tarballs = (await readdir(packDirectory)).filter((name) => name.endsWith('.tgz'));
-  if (tarballs.length !== 1) throw new Error(`Expected one CLI tarball; found ${tarballs.length}.`);
-  const cliTarball = path.join(packDirectory, tarballs[0]);
+  if (tarballs.length !== releasePackages.length) {
+    throw new Error(
+      `Expected ${releasePackages.length} release tarballs; found ${tarballs.length}.`,
+    );
+  }
+  const packedByName = new Map(
+    releasePackages.map((releasePackage) => {
+      const prefix = `${releasePackage.name.replace('@', '').replace('/', '-')}-`;
+      const tarball = tarballs.find((candidate) => candidate.startsWith(prefix));
+      if (!tarball) throw new Error(`Missing packed artifact for ${releasePackage.name}.`);
+      return [releasePackage.name, path.join(packDirectory, tarball)];
+    }),
+  );
+  const localDependencies = Object.fromEntries(
+    [...packedByName.entries()].map(([name, tarball]) => [
+      name,
+      `file:${tarball.replaceAll('\\', '/')}`,
+    ]),
+  );
 
   await writeFile(
     path.join(consumerDirectory, 'package.json'),
-    `${JSON.stringify({ name: 'boolink-cross-platform-smoke', version: '0.0.0', private: true }, null, 2)}\n`,
+    `${JSON.stringify(
+      {
+        name: 'boolink-cross-platform-smoke',
+        version: '0.0.0',
+        private: true,
+        dependencies: localDependencies,
+      },
+      null,
+      2,
+    )}\n`,
     'utf8',
   );
-  run(pnpmCommand, ['add', '--ignore-scripts', '--save-exact', cliTarball], {
+  const overrideLines = Object.entries(localDependencies).map(
+    ([name, dependency]) => `  ${JSON.stringify(name)}: ${JSON.stringify(dependency)}`,
+  );
+  await writeFile(
+    path.join(consumerDirectory, 'pnpm-workspace.yaml'),
+    `packages:\n  - '.'\noverrides:\n${overrideLines.join('\n')}\n`,
+    'utf8',
+  );
+  run(pnpmCommand, ['install', '--ignore-scripts'], {
     cwd: consumerDirectory,
   });
 
@@ -115,15 +158,56 @@ try {
     delete cliEnvironment[variable];
   }
 
-  function boo(args) {
-    return run(process.execPath, [cli, ...args], {
-      cwd: consumerDirectory,
-      env: cliEnvironment,
+  const binarySearch = run(process.execPath, [cli, 'search', 'github'], {
+    cwd: consumerDirectory,
+    env: cliEnvironment,
+  });
+  expectIncludes(binarySearch, 'github', 'packed CLI executable');
+
+  const cliModule = await import(
+    pathToFileURL(
+      path.join(consumerDirectory, 'node_modules', '@boolink-dev', 'cli', 'dist', 'index.js'),
+    ).href
+  );
+  const integrationTarballs = new Map([
+    ['github', packedByName.get('@boolink-dev/github')],
+    ['cloudflare', packedByName.get('@boolink-dev/cloudflare')],
+  ]);
+
+  async function installCandidate(request) {
+    const tarball = integrationTarballs.get(request.integrationId);
+    if (!tarball) throw new Error(`Missing local artifact for ${request.integrationId}.`);
+    return cliModule.installManagedPackage({
+      ...request,
+      packageSpec: `file:${tarball.replaceAll('\\', '/')}`,
     });
   }
 
+  async function boo(args) {
+    let stdout = '';
+    let stderr = '';
+    const exitCode = await cliModule.runCli(args, {
+      environment: cliEnvironment,
+      boolinkHome,
+      userHome: smokeDirectory,
+      currentDirectory: consumerDirectory,
+      nodeExecutable: process.execPath,
+      installPackage: installCandidate,
+      stdout: (text) => {
+        stdout += text;
+      },
+      stderr: (text) => {
+        stderr += text;
+      },
+    });
+    if (exitCode !== 0) {
+      throw new Error(`boo ${args.join(' ')} failed.\n${redact(stderr)}`);
+    }
+    return stdout;
+  }
+
   for (const integrationId of ['github', 'cloudflare']) {
-    const search = boo(['search', integrationId]);
+    const search = await boo(['search', integrationId]);
     expectIncludes(search, integrationId, `${integrationId} search`);
     expectIncludes(search, '10 tools', `${integrationId} search`);
   }
@@ -133,14 +217,21 @@ try {
     cloudflare: path.join(outputDirectory, 'cloudflare.json'),
   };
 
-  const preview = boo(['add', 'github', '--client', 'custom-json', '--output', configPaths.github]);
+  const preview = await boo([
+    'add',
+    'github',
+    '--client',
+    'custom-json',
+    '--output',
+    configPaths.github,
+  ]);
   expectIncludes(preview, 'Preview only. No files were changed.', 'GitHub install preview');
   if ((await exists(boolinkHome)) || (await exists(configPaths.github))) {
     throw new Error('The install preview changed the filesystem.');
   }
 
   for (const integrationId of ['github', 'cloudflare']) {
-    const installed = boo([
+    const installed = await boo([
       'add',
       integrationId,
       '--client',
@@ -156,26 +247,30 @@ try {
     expectIncludes(config, variableName, `${integrationId} client configuration`);
   }
 
-  const list = boo(['list']);
+  const list = await boo(['list']);
   expectIncludes(list, 'github', 'installed integration list');
   expectIncludes(list, 'cloudflare', 'installed integration list');
 
-  const doctor = boo(['doctor']);
+  const doctor = await boo(['doctor']);
   expectIncludes(doctor, 'PASS github server launcher', 'doctor');
   expectIncludes(doctor, 'PASS cloudflare server launcher', 'doctor');
   expectIncludes(doctor, 'BooLink doctor found no blocking problems.', 'doctor');
 
-  const repairPreview = boo(['repair', 'github']);
+  const repairPreview = await boo(['repair', 'github']);
   expectIncludes(repairPreview, 'Preview only. No files were changed.', 'repair preview');
-  expectIncludes(boo(['repair', 'github', '--yes']), 'github repaired', 'repair');
-  expectIncludes(boo(['upgrade', 'github']), 'already current', 'current-version upgrade');
+  expectIncludes(await boo(['repair', 'github', '--yes']), 'github repaired', 'repair');
+  expectIncludes(await boo(['upgrade', 'github']), 'already current', 'current-version upgrade');
 
   await assertSecretsAbsent([boolinkHome, outputDirectory]);
 
-  const removePreview = boo(['remove', 'cloudflare']);
+  const removePreview = await boo(['remove', 'cloudflare']);
   expectIncludes(removePreview, 'Preview only. No files were changed.', 'remove preview');
   for (const integrationId of ['cloudflare', 'github']) {
-    expectIncludes(boo(['remove', integrationId, '--yes']), 'removed.', `${integrationId} remove`);
+    expectIncludes(
+      await boo(['remove', integrationId, '--yes']),
+      'removed.',
+      `${integrationId} remove`,
+    );
     if (await exists(configPaths[integrationId])) {
       throw new Error(`${integrationId} client configuration remained after removal.`);
     }
@@ -184,8 +279,12 @@ try {
     }
   }
 
-  expectIncludes(boo(['list']), 'No BooLink integrations are installed.', 'empty list');
-  expectIncludes(boo(['doctor']), 'BooLink doctor found no blocking problems.', 'empty doctor');
+  expectIncludes(await boo(['list']), 'No BooLink integrations are installed.', 'empty list');
+  expectIncludes(
+    await boo(['doctor']),
+    'BooLink doctor found no blocking problems.',
+    'empty doctor',
+  );
   const finalState = JSON.parse(
     await readFile(path.join(boolinkHome, 'installations.json'), 'utf8'),
   );

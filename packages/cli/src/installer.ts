@@ -11,6 +11,8 @@ export type ManagedInstallRequest = {
   nodeExecutable: string;
   environment: NodeJS.ProcessEnv;
   credentialEnvironment: string[];
+  /** Local release artifact used by verification; normal CLI installs always use `version`. */
+  packageSpec?: string;
 };
 
 export type ManagedInstallResult = {
@@ -207,7 +209,7 @@ export const installManagedPackage: ManagedPackageInstaller = async (
           name: `boolink-managed-${request.integrationId}`,
           private: true,
           version: '0.0.0',
-          dependencies: { [request.packageName]: request.version },
+          dependencies: { [request.packageName]: request.packageSpec ?? request.version },
         },
         null,
         2,

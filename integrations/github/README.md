@@ -4,7 +4,7 @@ Local-first GitHub MCP integration for BooLink. It runs in the user's environmen
 directly with GitHub's REST API. BooLink infrastructure does not receive, proxy, persist, or log the
 configured credential.
 
-Version 0.2.0 is BooLink's complete GitHub MVP: six bounded read tools and four deliberately scoped
+Version 0.2.1 is BooLink's official GitHub MVP: six bounded read tools and four deliberately scoped
 issue and pull-request write tools. “Complete” means the supported surface below is implemented,
 packaged, tested, and documented; it does not imply coverage of every GitHub API.
 
@@ -162,7 +162,8 @@ Create a draft pull request after its commits have already been pushed:
   through the official MCP stdio client without contacting GitHub.
 - `github.get_authenticated_user` was additionally verified against the live GitHub API with
   `@boolink-dev/github@0.2.0` on 2026-08-13. The other nine tools remain contract-tested rather than
-  live-account tested.
+  live-account tested. Version 0.2.1 changes release metadata and the package user-agent only; the
+  verified provider request and response implementation is unchanged.
 - The Codex adapter and neutral JSON launch document are the supported client configuration paths.
 
 ## Troubleshooting

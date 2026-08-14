@@ -197,13 +197,13 @@ export const cloudflareManifest: IntegrationManifest = {
   name: 'Cloudflare',
   description:
     'Connect AI agents to Cloudflare zones, DNS records, and cache operations through a local MCP server.',
-  version: '0.1.0',
+  version: '0.1.1',
   provider: 'Cloudflare',
   category: 'infrastructure',
   packageName: '@boolink-dev/cloudflare',
   repositoryUrl: 'https://github.com/ColinRM000/boolink',
   documentationUrl: 'https://boolink.dev/integrations/cloudflare',
-  verification: 'experimental',
+  verification: 'official',
   authentication: {
     type: 'bearer-token',
     instructionsUrl: 'https://developers.cloudflare.com/fundamentals/api/get-started/create-token/',

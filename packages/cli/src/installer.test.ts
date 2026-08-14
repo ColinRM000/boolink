@@ -15,7 +15,8 @@ async function fakeNpm(directory: string, fail = false): Promise<string> {
       import path from 'node:path';
       if (process.env.GITHUB_TOKEN) process.exit(9);
       const root = JSON.parse(await readFile(path.join(process.cwd(), 'package.json'), 'utf8'));
-      const [name, version] = Object.entries(root.dependencies)[0];
+      const [name, requested] = Object.entries(root.dependencies)[0];
+      const version = process.env.BOOLINK_FAKE_PACKAGE_VERSION ?? requested;
       const packageDirectory = path.join(process.cwd(), 'node_modules', ...name.split('/'));
       await mkdir(path.join(packageDirectory, 'dist'), { recursive: true });
       await writeFile(path.join(packageDirectory, 'package.json'), JSON.stringify({
@@ -60,6 +61,36 @@ describe('managed package installer', () => {
     expect(managedPackage.dependencies).toEqual({ '@boolink-dev/github': '0.1.0' });
     expect(await readFile(result.launcherPath, 'utf8')).toContain(
       './0.1.0/node_modules/@boolink-dev/github/dist/server.js',
+    );
+    await result.commit?.();
+  });
+
+  it('can verify a local release artifact while preserving expected package identity', async () => {
+    const directory = await mkdtemp(path.join(os.tmpdir(), 'boolink-installer-artifact-'));
+    const boolinkHome = path.join(directory, '.boolink');
+    const npmCli = await fakeNpm(directory);
+    const packageSpec = `file:${path.join(directory, 'boolink-dev-github-0.2.1.tgz')}`;
+    const result = await installManagedPackage({
+      boolinkHome,
+      integrationId: 'github',
+      packageName: '@boolink-dev/github',
+      version: '0.2.1',
+      packageSpec,
+      nodeExecutable: process.execPath,
+      environment: {
+        ...process.env,
+        npm_execpath: npmCli,
+        BOOLINK_FAKE_PACKAGE_VERSION: '0.2.1',
+      },
+      credentialEnvironment: ['GITHUB_TOKEN'],
+    });
+
+    const managedPackage = JSON.parse(
+      await readFile(path.join(result.versionDirectory, 'package.json'), 'utf8'),
+    ) as { dependencies: Record<string, string> };
+    expect(managedPackage.dependencies).toEqual({ '@boolink-dev/github': packageSpec });
+    expect(await readFile(result.launcherPath, 'utf8')).toContain(
+      './0.2.1/node_modules/@boolink-dev/github/dist/server.js',
     );
     await result.commit?.();
   });

@@ -8,8 +8,8 @@ BooLink is an open-source, local-first integration ecosystem for AI agents. It p
 maintained MCP servers that connect compatible AI clients to services such as GitHub and
 Cloudflare without routing user credentials through BooLink infrastructure.
 
-> BooLink is in active development. GitHub and Cloudflare integrations are implemented with
-> versioned CLI and package releases available on npm.
+> BooLink is pre-1.0 and in active development. GitHub and Cloudflare are official integrations
+> with versioned CLI and package releases available on npm.
 
 ## Principles
 
@@ -44,7 +44,7 @@ pnpm check
 pnpm dev:web
 ```
 
-Launch the experimental CLI from npm:
+Launch the pre-1.0 CLI from npm:
 
 ```bash
 npx @boolink-dev/cli
@@ -67,7 +67,8 @@ node packages/cli/dist/bin.js add cloudflare --client codex
 ```
 
 See [the implementation plan](docs/implementation-plan.md) for the delivery sequence and
-[the MVP criteria](docs/mvp-acceptance-criteria.md) for the release gates. The public site is
+[the project status](docs/project-status.md) for current progress. The
+[MVP criteria](docs/mvp-acceptance-criteria.md) define the release gates. The public site is
 available at [boolink.dev](https://boolink.dev); see the
 [Cloudflare Pages runbook](docs/deployment/cloudflare-pages.md) for hosting details.
 
