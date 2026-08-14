@@ -1580,6 +1580,12 @@ h2 {
   background: rgba(1, 5, 14, 0.52);
 }
 
+.setup-client-switch {
+  position: relative;
+  z-index: 1;
+  margin: 1rem 0 0;
+}
+
 .platform-switch button {
   padding: 0.38rem 0.55rem;
   color: #697693;

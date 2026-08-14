@@ -62,7 +62,7 @@ const HELP = `BooLink CLI
 Usage:
   boo search [query]
   boo info <integration>
-  boo add <integration> [--client codex|custom-json] [--output <path>] [--yes]
+  boo add <integration> [--client claude-code|codex|custom-json] [--output <path>] [--yes]
   boo remove <integration> [--yes]
   boo repair <integration> [--yes]
   boo upgrade <integration> [--yes]
@@ -106,8 +106,8 @@ function parseAddOptions(args: string[]): AddOptions {
     }
     if (option === '--client') {
       const value = args[index + 1];
-      if (value !== 'codex' && value !== 'custom-json') {
-        throw new Error('--client must be codex or custom-json.');
+      if (value !== 'claude-code' && value !== 'codex' && value !== 'custom-json') {
+        throw new Error('--client must be claude-code, codex, or custom-json.');
       }
       client = value;
       index += 1;
@@ -150,6 +150,7 @@ function resolveOutputPath(
 ): string | undefined {
   if (!options.client) return undefined;
   if (options.output) return path.resolve(currentDirectory, options.output);
+  if (options.client === 'claude-code') return path.join(userHome, '.claude.json');
   if (options.client === 'codex') return path.join(userHome, '.codex', 'config.toml');
   throw new Error('--output is required for custom-json.');
 }

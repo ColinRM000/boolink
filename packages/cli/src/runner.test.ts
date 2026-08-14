@@ -238,6 +238,57 @@ describe('BooLink CLI', () => {
     await expect(readFile(output, 'utf8')).rejects.toMatchObject({ code: 'ENOENT' });
   });
 
+  it('installs and removes a private user-scoped Claude Code configuration', async () => {
+    const secret = 'github_pat_claude_code_must_not_store';
+    const test = await harness({ GITHUB_TOKEN: secret });
+    const claudeConfig = path.join(test.directory, '.claude.json');
+    await writeFile(
+      claudeConfig,
+      `${JSON.stringify({
+        numStartups: 3,
+        mcpServers: { existing: { type: 'stdio', command: 'existing-server', args: [] } },
+      })}\n`,
+      'utf8',
+    );
+
+    expect(await runCli(['add', 'github', '--client', 'claude-code', '--yes'], test.context)).toBe(
+      0,
+    );
+
+    const configuration = await readFile(claudeConfig, 'utf8');
+    const parsed = JSON.parse(configuration) as {
+      numStartups: number;
+      mcpServers: Record<string, { env?: Record<string, string> }>;
+    };
+    expect(parsed.numStartups).toBe(3);
+    expect(parsed.mcpServers.existing).toBeDefined();
+    expect(parsed.mcpServers.boolink_github?.env).toEqual({
+      GITHUB_TOKEN: '${GITHUB_TOKEN}',
+    });
+    expect(configuration).not.toContain(secret);
+
+    const state = await readFile(
+      path.join(test.directory, '.boolink', 'installations.json'),
+      'utf8',
+    );
+    expect(state).toContain('"adapter": "claude-code"');
+    expect(state).not.toContain(secret);
+
+    test.stdout.length = 0;
+    expect(await runCli(['doctor'], test.context)).toBe(0);
+    expect(test.stdout.join('')).toContain('PASS claude-code configuration');
+
+    expect(await runCli(['remove', 'github', '--yes'], test.context)).toBe(0);
+    const remaining = JSON.parse(await readFile(claudeConfig, 'utf8')) as {
+      numStartups: number;
+      mcpServers: Record<string, unknown>;
+    };
+    expect(remaining).toEqual({
+      numStartups: 3,
+      mcpServers: { existing: { type: 'stdio', command: 'existing-server', args: [] } },
+    });
+  });
+
   it('redacts a provider-style secret from installer failures', async () => {
     const test = await harness();
     test.context.installPackage = async () => {

@@ -6,7 +6,7 @@ import * as z from 'zod/v4';
 
 const clientConfigurationSchema = z
   .object({
-    adapter: z.enum(['codex', 'custom-json']),
+    adapter: z.enum(['claude-code', 'codex', 'custom-json']),
     path: z.string().min(1),
   })
   .strict();

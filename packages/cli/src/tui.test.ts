@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import path from 'node:path';
 
 import { bundledRegistry } from '@boolink-dev/registry';
 import {
@@ -76,7 +77,17 @@ describe('interactive integration shop', () => {
   });
 
   it('can install without changing a client configuration', () => {
-    const approved = press(createShopState(), 'enter', 'i', 'down', 'enter', 'y');
+    const approved = press(createShopState(), 'enter', 'i', 'down', 'down', 'enter', 'y');
     expect(approved.command).toEqual(['add', 'cloudflare', '--yes']);
+  });
+
+  it('offers Claude Code as a first-class client choice', () => {
+    const beforeApproval = press(createShopState(), 'enter', 'i', 'down', 'enter');
+    const rendered = renderShop(beforeApproval.state, bundledRegistry, {}, '/users/octocat', false);
+    expect(rendered).toContain('Claude Code');
+    expect(rendered).toContain(path.join('/users/octocat', '.claude.json'));
+
+    const approved = press(beforeApproval.state, 'y');
+    expect(approved.command).toEqual(['add', 'cloudflare', '--client', 'claude-code', '--yes']);
   });
 });

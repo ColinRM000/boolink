@@ -52,8 +52,8 @@ npx @boolink-dev/cli
 
 First-time setup guides:
 
-- [Connect GitHub to Codex](docs/getting-started/github.md)
-- [Connect Cloudflare to Codex](docs/getting-started/cloudflare.md)
+- [Connect GitHub to Codex or Claude Code](docs/getting-started/github.md)
+- [Connect Cloudflare to Codex or Claude Code](docs/getting-started/cloudflare.md)
 
 Or build it locally to inspect either integration:
 
@@ -64,6 +64,7 @@ node packages/cli/dist/bin.js search github
 node packages/cli/dist/bin.js search cloudflare
 node packages/cli/dist/bin.js add github --client codex
 node packages/cli/dist/bin.js add cloudflare --client codex
+node packages/cli/dist/bin.js add github --client claude-code
 ```
 
 See [the implementation plan](docs/implementation-plan.md) for the delivery sequence and

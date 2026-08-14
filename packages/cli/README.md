@@ -1,6 +1,6 @@
 # `@boolink-dev/cli`
 
-Experimental local-first CLI for discovering, inspecting, installing, configuring, and diagnosing
+Pre-1.0 local-first CLI for discovering, inspecting, installing, configuring, and diagnosing
 BooLink integrations.
 
 ## Commands
@@ -8,7 +8,7 @@ BooLink integrations.
 ```text
 boo search [query]
 boo info <integration>
-boo add <integration> [--client codex|custom-json] [--output <path>] [--yes]
+boo add <integration> [--client claude-code|codex|custom-json] [--output <path>] [--yes]
 boo remove <integration> [--yes]
 boo repair <integration> [--yes]
 boo upgrade <integration> [--yes]
@@ -44,6 +44,7 @@ default. They change files only when `--yes` is present.
 node packages/cli/dist/bin.js add github --client codex
 node packages/cli/dist/bin.js add github --client codex --yes
 node packages/cli/dist/bin.js add cloudflare --client codex
+node packages/cli/dist/bin.js add github --client claude-code
 ```
 
 Codex configuration defaults to `~/.codex/config.toml`. Use `--output` to target a project-scoped
@@ -51,6 +52,14 @@ configuration instead:
 
 ```bash
 node packages/cli/dist/bin.js add github --client codex --output .codex/config.toml --yes
+```
+
+Claude Code configuration defaults to the private user-scope file `~/.claude.json`. BooLink merges
+a `boolink_<integration>` stdio entry into its top-level `mcpServers` object and uses Claude Code's
+`${VARIABLE}` expansion syntax so the provider credential remains in the environment:
+
+```bash
+node packages/cli/dist/bin.js add github --client claude-code --yes
 ```
 
 For another MCP client, generate a neutral JSON document at a new path:
@@ -86,7 +95,8 @@ written atomically, with rollback around installation and configuration failures
 
 - The CLI is pre-1.0 and its public API may change before 1.0.
 - GitHub and Cloudflare are the two official catalog entries and server packages.
-- The Codex adapter and neutral JSON output are the first supported client paths.
+- Codex and Claude Code are supported client adapters. Neutral JSON remains available for manual
+  configuration of other stdio MCP clients.
 - `doctor` performs local diagnostics only. It does not call providers or send telemetry.
 - `upgrade` follows the version in the bundled registry; refresh the CLI to receive a newer catalog.
 - The CLI references credential variable names but does not create provider tokens or store their

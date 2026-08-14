@@ -59,10 +59,13 @@ function environmentCommand(provider: SetupProvider, platform: 'windows' | 'unix
 }
 
 export function SetupGuide({ provider, onProviderChange }: SetupGuideProps) {
+  const [client, setClient] = useState<'claude-code' | 'codex'>('codex');
   const [platform, setPlatform] = useState<'windows' | 'unix'>(() =>
     navigator.userAgent.includes('Windows') ? 'windows' : 'unix',
   );
   const guide = getSetupGuide(provider);
+  const clientName = client === 'codex' ? 'Codex' : 'Claude Code';
+  const installCommand = `npx @boolink-dev/cli add ${guide.id} --client ${client}`;
 
   return (
     <section className="section setup-section" id="setup" data-scroll-section>
@@ -113,13 +116,38 @@ export function SetupGuide({ provider, onProviderChange }: SetupGuideProps) {
               <img src={guide.logo} alt={`${guide.name} logo`} />
             </span>
             <div>
-              <p className="integration-category">{guide.name} + Codex</p>
+              <p className="integration-category">
+                {guide.name} + {clientName}
+              </p>
               <h3>Ready in four reviewed steps.</h3>
               <p>
                 Requires Node.js 22 or newer. Start with the narrowest token permissions and a
                 read-only identity check before enabling any mutating tools.
               </p>
             </div>
+          </div>
+
+          <div
+            className="platform-switch setup-client-switch"
+            role="group"
+            aria-label="Choose AI client"
+          >
+            <button
+              type="button"
+              className={client === 'codex' ? 'is-active' : undefined}
+              aria-pressed={client === 'codex'}
+              onClick={() => setClient('codex')}
+            >
+              Codex
+            </button>
+            <button
+              type="button"
+              className={client === 'claude-code' ? 'is-active' : undefined}
+              aria-pressed={client === 'claude-code'}
+              onClick={() => setClient('claude-code')}
+            >
+              Claude Code
+            </button>
           </div>
 
           <ol className="setup-steps">
@@ -181,8 +209,8 @@ export function SetupGuide({ provider, onProviderChange }: SetupGuideProps) {
                   command={environmentCommand(guide.id, platform)}
                 />
                 <p className="setup-note">
-                  Restart Codex after setting a persistent Windows user variable. On macOS or Linux,
-                  launch the client from the same session or use its normal secret manager.
+                  Restart {clientName} after setting a persistent Windows user variable. On macOS or
+                  Linux, launch the client from the same session or use its normal secret manager.
                 </p>
               </div>
             </li>
@@ -197,8 +225,8 @@ export function SetupGuide({ provider, onProviderChange }: SetupGuideProps) {
                     <h4>Inspect the exact installation plan.</h4>
                   </div>
                 </div>
-                <CommandBlock label="Preview only" command={guide.installPreview} />
-                <CommandBlock label="Apply after review" command={guide.installApply} />
+                <CommandBlock label="Preview only" command={installCommand} />
+                <CommandBlock label="Apply after review" command={`${installCommand} --yes`} />
                 <p className="setup-note">
                   The preview identifies the package, launcher, credential-variable name, and client
                   file before <code>--yes</code> permits any change.

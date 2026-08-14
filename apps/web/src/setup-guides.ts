@@ -12,8 +12,6 @@ export type SetupGuide = {
   tokenUrl: string;
   documentationUrl: string;
   permissions: readonly string[];
-  installPreview: string;
-  installApply: string;
   firstPrompt: string;
 };
 
@@ -59,8 +57,6 @@ export const setupGuides: readonly SetupGuide[] = integrations.map((integration)
     tokenUrl,
     documentationUrl: integrationPath(integration.id),
     permissions: setupPresentation[integration.id].permissions,
-    installPreview: `npx @boolink-dev/cli add ${integration.id} --client codex`,
-    installApply: `npx @boolink-dev/cli add ${integration.id} --client codex --yes`,
     firstPrompt: setupPresentation[integration.id].firstPrompt,
   };
 });
