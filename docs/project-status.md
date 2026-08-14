@@ -34,11 +34,18 @@ long-term product vision is finished.
 - Cloudflare Pages deployed merged commit `a4450c9` to production. The homepage and both direct
   integration routes returned HTTP 200 and rendered their official versions and complete tool
   surfaces.
+- A clean Codex CLI journey installed the public CLI and GitHub packages into isolated local state,
+  completed `github.get_authenticated_user` over stdio, recorded only sanitized pass metadata, and
+  removed its temporary profile, installation, credential environment, and run directory.
+
+## MVP acceptance
+
+The scoped v0.6.0 MVP acceptance gate is complete. Foundation, two official integrations, the
+registry, public CLI lifecycle, website, cross-platform packed-package journeys, live read checks,
+and a clean supported-client invocation are all implemented and evidenced.
 
 ## Next phase gate
 
-1. Install through the public CLI into a clean supported client configuration and invoke a
-   read-only provider tool through that client.
-2. Record sanitized client-journey evidence under `docs/verification`.
-3. Select the third integration through an ADR based on architectural contrast rather than catalog
-   size.
+Select the third integration through an ADR based on architectural contrast rather than catalog
+size, then implement it against the proven core, SDK, registry, CLI, and website path. Ecosystem
+submission and verification governance remains the parallel preparation track.
