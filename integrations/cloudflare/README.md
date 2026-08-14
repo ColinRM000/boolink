@@ -4,7 +4,7 @@ Local-first Cloudflare MCP integration for BooLink. It runs beside the user's AI
 directly to Cloudflare's API. BooLink infrastructure never receives, proxies, stores, or logs the
 configured API token.
 
-Version 0.1.0 is the complete initial Cloudflare integration: five bounded read tools and five
+Version 0.1.1 is the official initial Cloudflare integration: five bounded read tools and five
 deliberately scoped DNS/cache operations. “Complete” means this supported surface is implemented,
 packaged, tested, and documented; it does not imply coverage of every Cloudflare product or API.
 
@@ -147,7 +147,8 @@ Purge one exact asset after a deployment:
   compatibility depends on the selected token permissions and zone plan.
 - `cloudflare.verify_token` and `cloudflare.list_zones` were additionally verified against the live
   Cloudflare API with `@boolink-dev/cloudflare@0.1.0` on 2026-08-13. The other eight tools remain
-  contract-tested rather than live-account tested.
+  contract-tested rather than live-account tested. Version 0.1.1 changes release metadata and the
+  package user-agent only; the verified provider request and response implementation is unchanged.
 
 ## Troubleshooting
 

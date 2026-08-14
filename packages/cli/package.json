@@ -1,6 +1,6 @@
 {
   "name": "@boolink-dev/cli",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Local-first command-line interface for BooLink integrations.",
   "license": "MIT",
   "homepage": "https://boolink.dev",

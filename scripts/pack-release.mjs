@@ -34,25 +34,25 @@ const packages = [
   {
     directory: 'packages/registry',
     name: '@boolink-dev/registry',
-    version: '0.3.0',
+    version: '0.3.1',
     required: ['package/dist/index.js', 'package/src/catalog.json'],
   },
   {
     directory: 'integrations/cloudflare',
     name: '@boolink-dev/cloudflare',
-    version: '0.1.0',
+    version: '0.1.1',
     required: ['package/dist/index.js', 'package/dist/server.js'],
   },
   {
     directory: 'integrations/github',
     name: '@boolink-dev/github',
-    version: '0.2.0',
+    version: '0.2.1',
     required: ['package/dist/index.js', 'package/dist/server.js'],
   },
   {
     directory: 'packages/cli',
     name: '@boolink-dev/cli',
-    version: '0.4.1',
+    version: '0.4.2',
     required: ['package/dist/index.js', 'package/dist/bin.js'],
   },
 ];

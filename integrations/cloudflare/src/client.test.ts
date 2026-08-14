@@ -96,7 +96,7 @@ describe('Cloudflare API client', () => {
     });
     expect(requests[0]?.init?.headers).toMatchObject({
       Authorization: `Bearer ${fakeToken}`,
-      'User-Agent': 'BooLink-Cloudflare/0.1.0',
+      'User-Agent': 'BooLink-Cloudflare/0.1.1',
     });
   });
 

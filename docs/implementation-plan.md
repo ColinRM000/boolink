@@ -1,6 +1,7 @@
 # Implementation plan
 
 Each phase ends in a runnable repository and has an explicit verification gate.
+Current completion and release evidence are tracked in [project status](project-status.md).
 
 ## Phase 1 — Foundation
 

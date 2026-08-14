@@ -20,98 +20,27 @@ import {
   TerminalSquare,
   Trash2,
   Workflow,
-  type LucideIcon,
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import {
+  cliVersion,
+  getIntegration,
+  integrationPath,
+  integrations,
+  primaryCredential,
+} from './catalog.js';
 import { SetupGuide } from './SetupGuide.js';
 import type { SetupProvider } from './setup-guides.js';
 
-type Integration = {
-  name: string;
-  description: string;
-  category: string;
-  status: 'Available' | 'Coming soon' | 'Community choice';
-  auth: string;
-  toolCount?: number;
-  icon?: LucideIcon;
-  logo?: string;
-  logoAlt?: string;
-  headline?: string;
-  overview?: string;
-  toolBreakdown?: string;
-  tools?: readonly (readonly [name: string, detail: string])[];
-};
-
-const githubTools = [
-  ['github.get_authenticated_user', 'Confirm the identity attached to the local token.'],
-  ['github.search_issues', 'Search issues with GitHub query syntax.'],
-  ['github.get_issue', 'Retrieve a single issue and its normalized metadata.'],
-  ['github.list_issue_comments', 'Read an issue or pull-request conversation.'],
-  ['github.list_pull_requests', 'List pull requests with branch and state filters.'],
-  ['github.get_pull_request', 'Retrieve one pull request and its branch metadata.'],
-  ['github.create_issue', 'Publish a reviewed repository issue.'],
-  ['github.update_issue', 'Change reviewed fields, labels, assignees, or state.'],
-  ['github.add_issue_comment', 'Publish a reviewed issue or pull-request comment.'],
-  ['github.create_pull_request', 'Open a pull request between pushed branches.'],
-] as const;
-
-const cloudflareTools = [
-  ['cloudflare.verify_token', 'Confirm that the local API token is active and usable.'],
-  ['cloudflare.list_zones', 'List the zones visible to the configured API token.'],
-  ['cloudflare.get_zone', 'Retrieve one zone and its normalized metadata.'],
-  ['cloudflare.list_dns_records', 'List and filter DNS records within a zone.'],
-  ['cloudflare.get_dns_record', 'Retrieve one DNS record by its exact identifier.'],
-  ['cloudflare.create_dns_record', 'Create a reviewed DNS record in a selected zone.'],
-  ['cloudflare.update_dns_record', 'Update reviewed fields on an existing DNS record.'],
-  ['cloudflare.delete_dns_record', 'Permanently delete one explicitly selected DNS record.'],
-  ['cloudflare.purge_cache_urls', 'Purge up to 30 exact URLs from a zone cache.'],
-  ['cloudflare.purge_everything', 'Purge an entire zone cache after explicit confirmation.'],
-] as const;
-
-const integrations: readonly Integration[] = [
-  {
-    name: 'GitHub',
-    description:
-      'Search issues, follow conversations, manage issue state, and open pull requests from your AI client.',
-    category: 'Development',
-    status: 'Available',
-    auth: 'Local GITHUB_TOKEN',
-    toolCount: 10,
-    logo: '/images/providers/github.png',
-    logoAlt: 'GitHub',
-    headline: 'Bring GitHub into the conversation.',
-    overview:
-      'Let your AI client search issues, read conversations, update issue state, add comments, and open pull requests. The integration talks directly to GitHub from your machine, so your token stays in your environment.',
-    toolBreakdown: '6 read · 4 write',
-    tools: githubTools,
-  },
-  {
-    name: 'Cloudflare',
-    description:
-      'Inspect zones and DNS, manage DNS records, and purge cache through a tightly scoped local server.',
-    category: 'Infrastructure',
-    status: 'Available',
-    auth: 'Local CLOUDFLARE_API_TOKEN',
-    toolCount: 10,
-    logo: '/images/providers/cloudflare.png',
-    logoAlt: 'Cloudflare',
-    headline: 'Operate Cloudflare without leaving the conversation.',
-    overview:
-      'Let your AI client inspect zones and DNS, create or update records, remove an explicitly selected record, and purge exact URLs or a confirmed full cache. The integration talks directly to Cloudflare from your machine, so your API token stays in your environment.',
-    toolBreakdown: '5 read · 5 DNS/cache',
-    tools: cloudflareTools,
-  },
-  {
-    name: 'Your most-wanted integration',
-    description:
-      'Future integrations will be prioritized around the tools the community uses most.',
-    category: 'Community',
-    status: 'Community choice',
-    auth: 'Provider-specific',
-    icon: Boxes,
-  },
-];
+const communityCard = {
+  name: 'Your most-wanted integration',
+  description: 'Future integrations will be prioritized around real use cases from the community.',
+  category: 'Community',
+  status: 'Community choice',
+  auth: 'Provider-specific',
+  icon: Boxes,
+} as const;
 
 const principles = [
   {
@@ -189,7 +118,10 @@ const roadmap = [
 
 export function App() {
   const [query, setQuery] = useState('');
-  const [setupProvider, setSetupProvider] = useState<SetupProvider>('github');
+  const [setupProvider, setSetupProvider] = useState<SetupProvider>(() => {
+    const requested = new URLSearchParams(window.location.search).get('integration');
+    return getIntegration(requested ?? '')?.id ?? 'github';
+  });
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -351,15 +283,34 @@ export function App() {
     if (!normalized) return integrations;
 
     return integrations.filter((integration) =>
-      [integration.name, integration.description, integration.category, integration.status]
+      [
+        integration.name,
+        integration.description,
+        integration.category,
+        integration.statusLabel,
+        integration.packageName,
+        ...integration.tools.map((tool) => tool.name),
+      ]
         .join(' ')
         .toLocaleLowerCase('en-US')
         .includes(normalized),
     );
   }, [query]);
 
-  const featuredIntegrations = filteredIntegrations.filter((integration) => integration.tools);
-  const catalogCards = filteredIntegrations.filter((integration) => !integration.tools);
+  const showCommunityCard = [
+    communityCard.name,
+    communityCard.description,
+    communityCard.category,
+    communityCard.status,
+  ]
+    .join(' ')
+    .toLocaleLowerCase('en-US')
+    .includes(query.trim().toLocaleLowerCase('en-US'));
+  const resultCount = filteredIntegrations.length + (showCommunityCard ? 1 : 0);
+  const totalTools = integrations.reduce(
+    (count, integration) => count + integration.tools.length,
+    0,
+  );
 
   return (
     <>
@@ -408,7 +359,8 @@ export function App() {
         </nav>
 
         <a className="header-status" href="#roadmap">
-          <span className="status-pulse" aria-hidden="true" />2 integrations available
+          <span className="status-pulse" aria-hidden="true" />
+          {integrations.length} official integrations
         </a>
       </header>
 
@@ -500,8 +452,8 @@ export function App() {
             <span>Runs beside your AI client</span>
           </div>
           <div>
-            <strong>20</strong>
-            <span>MCP tools across 2 integrations</span>
+            <strong>{totalTools}</strong>
+            <span>MCP tools across {integrations.length} integrations</span>
           </div>
           <div>
             <strong>0</strong>
@@ -537,10 +489,10 @@ export function App() {
             </span>
           </label>
           <p className="result-count" aria-live="polite">
-            {filteredIntegrations.length} {filteredIntegrations.length === 1 ? 'result' : 'results'}
+            {resultCount} {resultCount === 1 ? 'result' : 'results'}
           </p>
 
-          {featuredIntegrations.map((integration) => (
+          {filteredIntegrations.map((integration) => (
             <article
               className={`integration-feature integration-feature-${integration.name.toLowerCase()}`}
               data-reveal="scale"
@@ -551,9 +503,11 @@ export function App() {
                   <span
                     className={`provider-logo provider-logo-${integration.name.toLowerCase()} provider-logo-featured`}
                   >
-                    <img src={integration.logo} alt={integration.logoAlt ?? integration.name} />
+                    <img src={integration.logo} alt={`${integration.name} logo`} />
                   </span>
-                  <span className="status-chip status-available">{integration.status}</span>
+                  <span className={`status-chip status-${integration.verification}`}>
+                    {integration.statusLabel}
+                  </span>
                 </div>
                 <p className="integration-category">{integration.name} integration</p>
                 <h3>{integration.headline}</h3>
@@ -563,13 +517,17 @@ export function App() {
                   aria-label={`${integration.name} integration attributes`}
                 >
                   <span>
-                    <strong>{integration.toolCount}</strong> tools
+                    <strong>{integration.tools.length}</strong> tools
                   </span>
                   <span>
                     <strong>stdio</strong> local transport
                   </span>
                   <span>
                     <strong>0</strong> hosted credentials
+                  </span>
+                  <span>
+                    <strong>{primaryCredential(integration).environmentVariables?.[0]}</strong>{' '}
+                    local auth
                   </span>
                 </div>
               </div>
@@ -578,14 +536,15 @@ export function App() {
                 <div className="toolbox-heading">
                   <span>Available MCP tools</span>
                   <span className="toolbox-readonly">
-                    <ShieldCheck size={13} aria-hidden="true" /> {integration.toolBreakdown}
+                    <ShieldCheck size={13} aria-hidden="true" /> {integration.readToolCount} read ·{' '}
+                    {integration.writeToolCount} write/admin
                   </span>
                 </div>
                 <ul>
-                  {integration.tools?.map(([name, detail]) => (
-                    <li key={name}>
-                      <code>{name}</code>
-                      <span>{detail}</span>
+                  {integration.tools.map((tool) => (
+                    <li key={tool.name}>
+                      <code>{tool.name}</code>
+                      <span>{tool.title}</span>
                     </li>
                   ))}
                 </ul>
@@ -614,28 +573,22 @@ export function App() {
                   >
                     Open {integration.name} setup <ArrowRight size={15} aria-hidden="true" />
                   </a>
+                  <a className="integration-guide-link" href={integrationPath(integration.id)}>
+                    Full details <ExternalLink size={14} aria-hidden="true" />
+                  </a>
                 </div>
               </div>
             </article>
           ))}
 
-          {catalogCards.length > 0 ? (
+          {showCommunityCard ? (
             <div className="integration-grid integration-grid-secondary" data-reveal="stagger">
-              {catalogCards.map((integration) => {
+              {[communityCard].map((integration) => {
                 const Icon = integration.icon;
                 return (
                   <article className="integration-card" key={integration.name}>
                     <div className="integration-card-top">
-                      {integration.logo ? (
-                        <span
-                          className={`provider-logo provider-logo-${integration.name.toLowerCase()}`}
-                        >
-                          <img
-                            src={integration.logo}
-                            alt={integration.logoAlt ?? integration.name}
-                          />
-                        </span>
-                      ) : Icon ? (
+                      {Icon ? (
                         <span className="integration-icon">
                           <Icon size={24} aria-hidden="true" />
                         </span>
@@ -656,12 +609,6 @@ export function App() {
                       <span>
                         <CircleDot size={15} aria-hidden="true" /> Explicit capabilities
                       </span>
-                      {integration.toolCount ? (
-                        <span>
-                          <PackageCheck size={15} aria-hidden="true" /> {integration.toolCount} MCP
-                          tools
-                        </span>
-                      ) : null}
                     </div>
                   </article>
                 );
@@ -675,7 +622,7 @@ export function App() {
         <section className="section cli-section" id="cli" data-scroll-section>
           <div className="section-heading" data-reveal="rise">
             <div>
-              <p className="kicker">Available on npm · CLI 0.4.0</p>
+              <p className="kicker">Available on npm · CLI {cliVersion}</p>
               <h2>One command in. A complete local lifecycle after.</h2>
             </div>
             <p>
@@ -687,7 +634,7 @@ export function App() {
           <div className="cli-launchpad" data-reveal="scale">
             <div className="cli-launch-copy">
               <span className="cli-release">
-                <span aria-hidden="true" /> Public package · v0.4.0
+                <span aria-hidden="true" /> Public package · v{cliVersion}
               </span>
               <h3>Meet Boo, your integration shop.</h3>
               <p>
@@ -716,7 +663,7 @@ export function App() {
                   <i />
                 </span>
                 <span>boolink · local terminal</span>
-                <span className="cli-version">v0.4.0</span>
+                <span className="cli-version">v{cliVersion}</span>
               </div>
               <div className="cli-window-body">
                 <p>
