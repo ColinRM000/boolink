@@ -11,8 +11,8 @@ long-term product vision is finished.
 | 1. Foundation                   | Complete                      | Monorepo, core contract, MCP SDK adapter, CI, security scanning, testing, documentation, and ADRs are established.                                                |
 | 2. GitHub reference integration | Complete for scoped MVP       | Ten documented tools are published, contract-tested, discoverable over stdio, and live read-verified.                                                             |
 | 3. Registry                     | Complete for official catalog | Deterministic schema-validated catalog contains GitHub and Cloudflare. Status, tools, scopes, versions, authentication, and source URLs drive the public website. |
-| 4. CLI                          | Complete for two clients      | Search, info, add, list, doctor, repair, upgrade, and remove support Codex and Claude Code. The packed journey runs on Windows, macOS, and Linux.                 |
-| 5. Website                      | Complete for MVP              | Registry-backed discovery, setup, and provider routes are live on `boolink.dev` and verified at desktop and mobile sizes.                                         |
+| 4. Client distribution          | Complete for three clients    | The CLI supports Codex and Claude Code; versioned one-click MCP Bundles support Claude Desktop. Cross-platform CLI and bundle journeys verify the local servers.  |
+| 5. Website                      | Complete for MVP              | Registry-backed discovery, setup, provider routes, and Claude Desktop downloads are published through `boolink.dev`.                                              |
 | 6. Additional integrations      | In progress                   | Cloudflare is complete for its scoped MVP. A third provider must be selected for architectural contrast.                                                          |
 | 7. Ecosystem preparation        | In progress                   | Contributor guidance, validation, CI security gates, Dependabot, and trusted publishing exist. Community templates and submission/verification governance remain. |
 
@@ -20,10 +20,10 @@ long-term product vision is finished.
 
 | Component              | Version | Status               |
 | ---------------------- | ------- | -------------------- |
-| GitHub integration     | `0.2.1` | Official, scoped MVP |
-| Cloudflare integration | `0.1.1` | Official, scoped MVP |
-| Registry               | `0.3.1` | Official catalog     |
-| CLI                    | `0.5.0` | Pre-1.0 public CLI   |
+| GitHub integration     | `0.2.2` | Official, scoped MVP |
+| Cloudflare integration | `0.1.2` | Official, scoped MVP |
+| Registry               | `0.3.2` | Official catalog     |
+| CLI                    | `0.5.1` | Pre-1.0 public CLI   |
 
 ## v0.6.0 release evidence
 
@@ -57,6 +57,15 @@ and a clean supported-client invocation are all implemented and evidenced.
 
 ## Next phase gate
 
-Select the third integration through an ADR based on architectural contrast rather than catalog
-size, then implement it against the proven core, SDK, registry, CLI, and website path. Ecosystem
-submission and verification governance remains the parallel preparation track.
+Publish and verify the v0.8.0 GitHub and Cloudflare MCP Bundles, then select the third integration
+through an ADR based on architectural contrast rather than catalog size. Ecosystem submission and
+verification governance remains the parallel preparation track.
+
+## v0.8.0 release scope
+
+- GitHub and Cloudflare ship as versioned `.mcpb` assets for one-click Claude Desktop installation.
+- Manifests use the current MCPB `0.4` schema and mark provider credentials as sensitive local user
+  configuration.
+- The release gate packs, unpacks, launches, and compares both bundle tool surfaces with the
+  registry before writing checksums.
+- The website presents client-specific setup for Codex, Claude Code, and Claude Desktop.

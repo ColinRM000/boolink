@@ -3,6 +3,7 @@ import {
   ArrowRight,
   Check,
   Copy,
+  Download,
   ExternalLink,
   KeyRound,
   LockKeyhole,
@@ -47,7 +48,9 @@ function CopyCommand({ command, label }: { command: string; label: string }) {
 }
 
 export function IntegrationPage({ integration }: IntegrationPageProps) {
-  const [installClient, setInstallClient] = useState<'claude-code' | 'codex'>('codex');
+  const [installClient, setInstallClient] = useState<'claude-code' | 'claude-desktop' | 'codex'>(
+    'codex',
+  );
   const guide = getSetupGuide(integration.id);
   const credential = primaryCredential(integration);
   const scopes = useMemo(
@@ -232,10 +235,33 @@ export function IntegrationPage({ integration }: IntegrationPageProps) {
                 >
                   Claude Code
                 </button>
+                <button
+                  type="button"
+                  className={installClient === 'claude-desktop' ? 'is-active' : undefined}
+                  aria-pressed={installClient === 'claude-desktop'}
+                  onClick={() => setInstallClient('claude-desktop')}
+                >
+                  Claude Desktop
+                </button>
               </div>
-              <CopyCommand label="Preview write plan" command={installCommand} />
-              <CopyCommand label="Apply after review" command={`${installCommand} --yes`} />
-              <CopyCommand label="Diagnose locally" command="npx @boolink-dev/cli doctor" />
+              {installClient === 'claude-desktop' ? (
+                <div className="desktop-download-panel">
+                  <p>
+                    Download the verified MCP Bundle, open it with Claude Desktop, and enter your
+                    token in Claude's masked local configuration prompt.
+                  </p>
+                  <a className="button button-primary" href={guide.desktopDownloadUrl}>
+                    <Download size={17} aria-hidden="true" /> Download .mcpb
+                  </a>
+                  <small>Available for current Claude Desktop on Windows and macOS.</small>
+                </div>
+              ) : (
+                <>
+                  <CopyCommand label="Preview write plan" command={installCommand} />
+                  <CopyCommand label="Apply after review" command={`${installCommand} --yes`} />
+                  <CopyCommand label="Diagnose locally" command="npx @boolink-dev/cli doctor" />
+                </>
+              )}
             </div>
 
             <div className="detail-install-card">

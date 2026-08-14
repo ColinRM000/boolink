@@ -1,4 +1,4 @@
-# Connect Cloudflare to Codex or Claude Code with BooLink
+# Connect Cloudflare to Codex, Claude Code, or Claude Desktop with BooLink
 
 This guide installs `@boolink-dev/cloudflare` as a local stdio MCP server. Start with read-only
 permissions; DNS changes and cache purges are administrative operations and should be added only
@@ -74,13 +74,24 @@ The CLI installs the catalog-pinned package under `~/.boolink`. The Codex adapte
 private user-scoped `boolink_cloudflare` entry to `~/.claude.json`. Both record only the credential
 variable name; neither writes the token value.
 
+### Claude Desktop one-click installation
+
+Claude Desktop users do not need the CLI or a separate Node.js installation. Download
+[`boolink-cloudflare-0.1.2.mcpb`](https://github.com/ColinRM000/boolink/releases/latest/download/boolink-cloudflare-0.1.2.mcpb),
+open the file with the current Claude Desktop app on Windows or macOS, and review its ten declared
+tools. Claude then displays a masked field for the Cloudflare API token and supplies it only to the
+local BooLink server process.
+
+The matching GitHub release includes `SHA256SUMS.txt` for independent artifact verification. The
+bundle contains no token value and does not require step 3's environment variable.
+
 ## 5. Diagnose and verify read-only behavior
 
 ```bash
 npx @boolink-dev/cli doctor
 ```
 
-Restart the selected client, then use this first prompt:
+Restart the selected client if requested, then use this first prompt:
 
 > Use `cloudflare.verify_token`, then list the zones visible to the token. Do not change DNS or purge
 > cache.

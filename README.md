@@ -50,10 +50,10 @@ Launch the pre-1.0 CLI from npm:
 npx @boolink-dev/cli
 ```
 
-First-time setup guides:
+First-time setup guides for Codex, Claude Code, and Claude Desktop:
 
-- [Connect GitHub to Codex or Claude Code](docs/getting-started/github.md)
-- [Connect Cloudflare to Codex or Claude Code](docs/getting-started/cloudflare.md)
+- [Connect GitHub](docs/getting-started/github.md)
+- [Connect Cloudflare](docs/getting-started/cloudflare.md)
 
 Or build it locally to inspect either integration:
 
@@ -75,14 +75,14 @@ available at [boolink.dev](https://boolink.dev); see the
 
 ## Release artifacts
 
-Maintainers can build the exact npm tarballs, install them in
-an isolated temporary project, smoke-test the installed CLI, and generate SHA-256 checksums with:
+Maintainers can build the exact npm tarballs and Claude Desktop MCP Bundles, install them in
+isolated temporary projects, smoke-test every local MCP server, and generate SHA-256 checksums with:
 
 ```bash
 pnpm release:pack
 ```
 
-Validated artifacts are written to the ignored `release/` directory. See
+Validated `.tgz` and `.mcpb` artifacts are written to the ignored `release/` directory. See
 [the release runbook](docs/releasing.md) for the publication prerequisites and dependency order.
 Pull requests also run the packed CLI's complete install and removal journey on Windows, macOS, and
 Linux; see the [cross-platform verification guide](docs/verification/cross-platform-cli.md).

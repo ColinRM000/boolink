@@ -25,7 +25,7 @@ describe('GitHub integration', () => {
       'github.get_pull_request',
       'github.create_pull_request',
     ]);
-    expect(githubManifest.version).toBe('0.2.1');
+    expect(githubManifest.version).toBe('0.2.2');
     expect(githubManifest.verification).toBe('official');
     expect(githubManifest.tools.find(({ name }) => name === 'github.update_issue')).toMatchObject({
       capabilities: ['modify', 'communication'],

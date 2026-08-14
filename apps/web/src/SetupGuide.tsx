@@ -2,9 +2,11 @@ import {
   Check,
   CheckCircle2,
   Copy,
+  Download,
   ExternalLink,
   KeyRound,
   LockKeyhole,
+  PackageOpen,
   RotateCcw,
   ShieldCheck,
   TerminalSquare,
@@ -59,12 +61,13 @@ function environmentCommand(provider: SetupProvider, platform: 'windows' | 'unix
 }
 
 export function SetupGuide({ provider, onProviderChange }: SetupGuideProps) {
-  const [client, setClient] = useState<'claude-code' | 'codex'>('codex');
+  const [client, setClient] = useState<'claude-code' | 'claude-desktop' | 'codex'>('codex');
   const [platform, setPlatform] = useState<'windows' | 'unix'>(() =>
     navigator.userAgent.includes('Windows') ? 'windows' : 'unix',
   );
   const guide = getSetupGuide(provider);
-  const clientName = client === 'codex' ? 'Codex' : 'Claude Code';
+  const clientName =
+    client === 'codex' ? 'Codex' : client === 'claude-code' ? 'Claude Code' : 'Claude Desktop';
   const installCommand = `npx @boolink-dev/cli add ${guide.id} --client ${client}`;
 
   return (
@@ -121,8 +124,9 @@ export function SetupGuide({ provider, onProviderChange }: SetupGuideProps) {
               </p>
               <h3>Ready in four reviewed steps.</h3>
               <p>
-                Requires Node.js 22 or newer. Start with the narrowest token permissions and a
-                read-only identity check before enabling any mutating tools.
+                {client === 'claude-desktop'
+                  ? 'Install with one local bundle. Start with the narrowest token permissions and a read-only identity check.'
+                  : 'Requires Node.js 22 or newer. Start with the narrowest token permissions and a read-only identity check before enabling any mutating tools.'}
               </p>
             </div>
           </div>
@@ -148,119 +152,228 @@ export function SetupGuide({ provider, onProviderChange }: SetupGuideProps) {
             >
               Claude Code
             </button>
+            <button
+              type="button"
+              className={client === 'claude-desktop' ? 'is-active' : undefined}
+              aria-pressed={client === 'claude-desktop'}
+              onClick={() => setClient('claude-desktop')}
+            >
+              Claude Desktop
+            </button>
           </div>
 
-          <ol className="setup-steps">
-            <li>
-              <div className="setup-step-number">01</div>
-              <div className="setup-step-content">
-                <div className="setup-step-heading">
-                  <KeyRound size={19} aria-hidden="true" />
-                  <div>
-                    <span>Create the provider credential</span>
-                    <h4>Use a {guide.tokenLabel}.</h4>
+          {client === 'claude-desktop' ? (
+            <ol className="setup-steps">
+              <li>
+                <div className="setup-step-number">01</div>
+                <div className="setup-step-content">
+                  <div className="setup-step-heading">
+                    <KeyRound size={19} aria-hidden="true" />
+                    <div>
+                      <span>Create the provider credential</span>
+                      <h4>Use a {guide.tokenLabel}.</h4>
+                    </div>
                   </div>
+                  <ul className="permission-list">
+                    {guide.permissions.map((permission) => (
+                      <li key={permission}>
+                        <Check size={14} aria-hidden="true" /> {permission}
+                      </li>
+                    ))}
+                  </ul>
+                  <a href={guide.tokenUrl} target="_blank" rel="noreferrer">
+                    Open {guide.name} token settings <ExternalLink size={14} aria-hidden="true" />
+                  </a>
                 </div>
-                <ul className="permission-list">
-                  {guide.permissions.map((permission) => (
-                    <li key={permission}>
-                      <Check size={14} aria-hidden="true" /> {permission}
-                    </li>
-                  ))}
-                </ul>
-                <a href={guide.tokenUrl} target="_blank" rel="noreferrer">
-                  Open {guide.name} token settings <ExternalLink size={14} aria-hidden="true" />
-                </a>
-              </div>
-            </li>
+              </li>
 
-            <li>
-              <div className="setup-step-number">02</div>
-              <div className="setup-step-content">
-                <div className="setup-step-heading">
-                  <LockKeyhole size={19} aria-hidden="true" />
-                  <div>
-                    <span>Keep it outside BooLink</span>
-                    <h4>Set {guide.tokenName} locally.</h4>
+              <li>
+                <div className="setup-step-number">02</div>
+                <div className="setup-step-content">
+                  <div className="setup-step-heading">
+                    <Download size={19} aria-hidden="true" />
+                    <div>
+                      <span>Download the reviewed release asset</span>
+                      <h4>Get the {guide.name} MCP Bundle.</h4>
+                    </div>
                   </div>
-                </div>
-                <div className="platform-switch" role="group" aria-label="Choose operating system">
-                  <button
-                    type="button"
-                    className={platform === 'windows' ? 'is-active' : undefined}
-                    aria-pressed={platform === 'windows'}
-                    onClick={() => setPlatform('windows')}
+                  <a
+                    className="button button-primary setup-download"
+                    href={guide.desktopDownloadUrl}
                   >
-                    Windows
-                  </button>
-                  <button
-                    type="button"
-                    className={platform === 'unix' ? 'is-active' : undefined}
-                    aria-pressed={platform === 'unix'}
-                    onClick={() => setPlatform('unix')}
+                    <Download size={16} aria-hidden="true" /> Download BooLink for {guide.name}
+                  </a>
+                  <p className="setup-note">
+                    The release also includes SHA-256 checksums. The bundle contains the local
+                    server and its runtime dependencies—never a provider credential.
+                  </p>
+                </div>
+              </li>
+
+              <li>
+                <div className="setup-step-number">03</div>
+                <div className="setup-step-content">
+                  <div className="setup-step-heading">
+                    <PackageOpen size={19} aria-hidden="true" />
+                    <div>
+                      <span>Install locally</span>
+                      <h4>Open the .mcpb file with Claude Desktop.</h4>
+                    </div>
+                  </div>
+                  <p>
+                    Review the declared tools, approve the extension, and enter {guide.tokenName}
+                    when Claude displays its masked credential field. Restart Claude Desktop if it
+                    asks you to.
+                  </p>
+                </div>
+              </li>
+
+              <li>
+                <div className="setup-step-number">04</div>
+                <div className="setup-step-content">
+                  <div className="setup-step-heading">
+                    <ShieldCheck size={19} aria-hidden="true" />
+                    <div>
+                      <span>Verify before writing</span>
+                      <h4>Begin with one read-only tool.</h4>
+                    </div>
+                  </div>
+                  <CommandBlock label="Safe first prompt" command={guide.firstPrompt} />
+                  <a href={guide.documentationUrl} target="_blank" rel="noreferrer">
+                    Read the complete {guide.name} guide{' '}
+                    <ExternalLink size={14} aria-hidden="true" />
+                  </a>
+                </div>
+              </li>
+            </ol>
+          ) : (
+            <ol className="setup-steps">
+              <li>
+                <div className="setup-step-number">01</div>
+                <div className="setup-step-content">
+                  <div className="setup-step-heading">
+                    <KeyRound size={19} aria-hidden="true" />
+                    <div>
+                      <span>Create the provider credential</span>
+                      <h4>Use a {guide.tokenLabel}.</h4>
+                    </div>
+                  </div>
+                  <ul className="permission-list">
+                    {guide.permissions.map((permission) => (
+                      <li key={permission}>
+                        <Check size={14} aria-hidden="true" /> {permission}
+                      </li>
+                    ))}
+                  </ul>
+                  <a href={guide.tokenUrl} target="_blank" rel="noreferrer">
+                    Open {guide.name} token settings <ExternalLink size={14} aria-hidden="true" />
+                  </a>
+                </div>
+              </li>
+
+              <li>
+                <div className="setup-step-number">02</div>
+                <div className="setup-step-content">
+                  <div className="setup-step-heading">
+                    <LockKeyhole size={19} aria-hidden="true" />
+                    <div>
+                      <span>Keep it outside BooLink</span>
+                      <h4>Set {guide.tokenName} locally.</h4>
+                    </div>
+                  </div>
+                  <div
+                    className="platform-switch"
+                    role="group"
+                    aria-label="Choose operating system"
                   >
-                    macOS / Linux
-                  </button>
-                </div>
-                <CommandBlock
-                  label={
-                    platform === 'windows' ? 'PowerShell · masked input' : 'Shell · current session'
-                  }
-                  command={environmentCommand(guide.id, platform)}
-                />
-                <p className="setup-note">
-                  Restart {clientName} after setting a persistent Windows user variable. On macOS or
-                  Linux, launch the client from the same session or use its normal secret manager.
-                </p>
-              </div>
-            </li>
-
-            <li>
-              <div className="setup-step-number">03</div>
-              <div className="setup-step-content">
-                <div className="setup-step-heading">
-                  <TerminalSquare size={19} aria-hidden="true" />
-                  <div>
-                    <span>Preview before writing</span>
-                    <h4>Inspect the exact installation plan.</h4>
+                    <button
+                      type="button"
+                      className={platform === 'windows' ? 'is-active' : undefined}
+                      aria-pressed={platform === 'windows'}
+                      onClick={() => setPlatform('windows')}
+                    >
+                      Windows
+                    </button>
+                    <button
+                      type="button"
+                      className={platform === 'unix' ? 'is-active' : undefined}
+                      aria-pressed={platform === 'unix'}
+                      onClick={() => setPlatform('unix')}
+                    >
+                      macOS / Linux
+                    </button>
                   </div>
+                  <CommandBlock
+                    label={
+                      platform === 'windows'
+                        ? 'PowerShell · masked input'
+                        : 'Shell · current session'
+                    }
+                    command={environmentCommand(guide.id, platform)}
+                  />
+                  <p className="setup-note">
+                    Restart {clientName} after setting a persistent Windows user variable. On macOS
+                    or Linux, launch the client from the same session or use its normal secret
+                    manager.
+                  </p>
                 </div>
-                <CommandBlock label="Preview only" command={installCommand} />
-                <CommandBlock label="Apply after review" command={`${installCommand} --yes`} />
-                <p className="setup-note">
-                  The preview identifies the package, launcher, credential-variable name, and client
-                  file before <code>--yes</code> permits any change.
-                </p>
-              </div>
-            </li>
+              </li>
 
-            <li>
-              <div className="setup-step-number">04</div>
-              <div className="setup-step-content">
-                <div className="setup-step-heading">
-                  <ShieldCheck size={19} aria-hidden="true" />
-                  <div>
-                    <span>Verify locally</span>
-                    <h4>Diagnose, restart, then begin read-only.</h4>
+              <li>
+                <div className="setup-step-number">03</div>
+                <div className="setup-step-content">
+                  <div className="setup-step-heading">
+                    <TerminalSquare size={19} aria-hidden="true" />
+                    <div>
+                      <span>Preview before writing</span>
+                      <h4>Inspect the exact installation plan.</h4>
+                    </div>
                   </div>
+                  <CommandBlock label="Preview only" command={installCommand} />
+                  <CommandBlock label="Apply after review" command={`${installCommand} --yes`} />
+                  <p className="setup-note">
+                    The preview identifies the package, launcher, credential-variable name, and
+                    client file before <code>--yes</code> permits any change.
+                  </p>
                 </div>
-                <CommandBlock label="Local diagnostics" command="npx @boolink-dev/cli doctor" />
-                <CommandBlock label="Safe first prompt" command={guide.firstPrompt} />
-                <a href={guide.documentationUrl} target="_blank" rel="noreferrer">
-                  Read the complete {guide.name} guide <ExternalLink size={14} aria-hidden="true" />
-                </a>
-              </div>
-            </li>
-          </ol>
+              </li>
+
+              <li>
+                <div className="setup-step-number">04</div>
+                <div className="setup-step-content">
+                  <div className="setup-step-heading">
+                    <ShieldCheck size={19} aria-hidden="true" />
+                    <div>
+                      <span>Verify locally</span>
+                      <h4>Diagnose, restart, then begin read-only.</h4>
+                    </div>
+                  </div>
+                  <CommandBlock label="Local diagnostics" command="npx @boolink-dev/cli doctor" />
+                  <CommandBlock label="Safe first prompt" command={guide.firstPrompt} />
+                  <a href={guide.documentationUrl} target="_blank" rel="noreferrer">
+                    Read the complete {guide.name} guide{' '}
+                    <ExternalLink size={14} aria-hidden="true" />
+                  </a>
+                </div>
+              </li>
+            </ol>
+          )}
 
           <div className="setup-boundary" aria-label="BooLink credential boundary">
             <ShieldCheck size={20} aria-hidden="true" />
             <div>
-              <strong>Your token never enters the command or BooLink configuration.</strong>
-              <span>
-                Only the variable name <code>{guide.tokenName}</code> is recorded. The installed
-                server reads its value from the local client process at runtime.
-              </span>
+              <strong>Your token never enters this website or BooLink infrastructure.</strong>
+              {client === 'claude-desktop' ? (
+                <span>
+                  The bundle marks the credential as sensitive. Claude Desktop collects it locally
+                  and supplies it only to the installed server process at runtime.
+                </span>
+              ) : (
+                <span>
+                  Only the variable name <code>{guide.tokenName}</code> is recorded. The installed
+                  server reads its value from the local client process at runtime.
+                </span>
+              )}
             </div>
             <RotateCcw size={18} aria-hidden="true" />
           </div>

@@ -8,3 +8,6 @@ allowBuilds:
   workerd: true
 
 minimumReleaseAge: 1440
+
+overrides:
+  tmp: 0.2.7

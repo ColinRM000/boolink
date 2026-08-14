@@ -11,6 +11,7 @@
   },
   "scripts": {
     "build": "pnpm -r --if-present build",
+    "build:mcpb": "pnpm build && node scripts/pack-mcpb.mjs release",
     "check": "pnpm format:check && pnpm lint && pnpm build && pnpm typecheck && pnpm test",
     "clean": "pnpm -r --if-present clean",
     "deploy:web": "pnpm --filter @boolink/web deploy",
@@ -30,6 +31,7 @@
     "verify:cross-platform": "node scripts/verify-cross-platform-cli.mjs"
   },
   "devDependencies": {
+    "@anthropic-ai/mcpb": "2.1.2",
     "@eslint/js": "10.0.1",
     "@modelcontextprotocol/client": "2.0.0",
     "@types/node": "22.20.1",

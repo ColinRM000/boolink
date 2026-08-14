@@ -9,6 +9,8 @@ import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 
+import { createMcpbReleaseMetadata } from './mcpb.mjs';
+
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const requestedOutput = process.argv[2] ?? 'release';
 const outputDirectory = path.resolve(repositoryRoot, requestedOutput);
@@ -34,25 +36,25 @@ const packages = [
   {
     directory: 'packages/registry',
     name: '@boolink-dev/registry',
-    version: '0.3.1',
+    version: '0.3.2',
     required: ['package/dist/index.js', 'package/src/catalog.json'],
   },
   {
     directory: 'integrations/cloudflare',
     name: '@boolink-dev/cloudflare',
-    version: '0.1.1',
+    version: '0.1.2',
     required: ['package/dist/index.js', 'package/dist/server.js'],
   },
   {
     directory: 'integrations/github',
     name: '@boolink-dev/github',
-    version: '0.2.1',
+    version: '0.2.2',
     required: ['package/dist/index.js', 'package/dist/server.js'],
   },
   {
     directory: 'packages/cli',
     name: '@boolink-dev/cli',
-    version: '0.5.0',
+    version: '0.5.1',
     required: ['package/dist/index.js', 'package/dist/bin.js'],
   },
 ];
@@ -281,12 +283,28 @@ try {
   await rm(smokeDirectory, { recursive: true, force: true });
 }
 
+run(process.execPath, [path.join(repositoryRoot, 'scripts', 'pack-mcpb.mjs'), outputDirectory]);
+const bundleMetadata = createMcpbReleaseMetadata(
+  JSON.parse(
+    await readFile(
+      path.join(repositoryRoot, 'packages', 'registry', 'src', 'catalog.json'),
+      'utf8',
+    ),
+  ),
+);
+const bundleFiles = Object.values(bundleMetadata)
+  .map(({ file }) => path.join(outputDirectory, file))
+  .sort();
+for (const bundleFile of bundleFiles) {
+  await readFile(bundleFile);
+}
+
 const checksumLines = [];
-for (const tarball of tarballs) {
+for (const artifact of [...tarballs, ...bundleFiles]) {
   const digest = createHash('sha256')
-    .update(await readFile(tarball))
+    .update(await readFile(artifact))
     .digest('hex');
-  checksumLines.push(`${digest}  ${path.basename(tarball)}`);
+  checksumLines.push(`${digest}  ${path.basename(artifact)}`);
 }
 await writeFile(
   path.join(outputDirectory, 'SHA256SUMS.txt'),
@@ -302,6 +320,7 @@ const releaseManifest = {
       { version, tarball: path.basename(packedByName.get(name)) },
     ]),
   ),
+  bundles: bundleMetadata,
 };
 await writeFile(
   path.join(outputDirectory, 'release-manifest.json'),
@@ -310,5 +329,5 @@ await writeFile(
 );
 
 process.stdout.write(
-  `Validated ${tarballs.length} publishable packages in ${outputDirectory}\n${tarballs.map((file) => `- ${path.basename(file)}`).join('\n')}\n`,
+  `Validated ${tarballs.length} publishable packages and ${bundleFiles.length} Claude Desktop bundles in ${outputDirectory}\n${[...tarballs, ...bundleFiles].map((file) => `- ${path.basename(file)}`).join('\n')}\n`,
 );

@@ -15,7 +15,7 @@ import {
 } from './schemas.js';
 
 const DEFAULT_BASE_URL = 'https://api.cloudflare.com/client/v4/';
-const USER_AGENT = 'BooLink-Cloudflare/0.1.1';
+const USER_AGENT = 'BooLink-Cloudflare/0.1.2';
 
 export type CloudflareFetch = (
   input: string | URL | Request,
