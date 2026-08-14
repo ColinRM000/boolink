@@ -47,5 +47,17 @@ contracts remain covered by mocked request, response, schema, pagination, MCP, e
 capability, and credential-leakage tests; they have not been exercised against a maintainer's live
 provider account.
 
+## Supported-client journey
+
+The public release was also exercised from a clean, isolated Codex CLI configuration. The journey
+installed GitHub through `@boolink-dev/cli@0.4.2`, launched the installed
+`@boolink-dev/github@0.2.1` stdio server, and completed
+`github.get_authenticated_user` through Codex CLI on 2026-08-14 at 01:17:57 UTC.
+
+The inspected record contains only package versions, client and transport names, the read-only tool
+name and capability, isolation flags, and the pass result. It contains no credential value, provider
+response, account identity, or provider resource data. The temporary client profile, integration
+installation, credential environment, and run directory were removed after the check.
+
 Live verification does not authorize mutating test calls and is not a substitute for mocked request,
 schema, pagination, error-normalization, capability, and credential-leakage coverage.
