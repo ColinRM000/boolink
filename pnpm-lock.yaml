@@ -82,8 +82,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/sdk
       zod:
-        specifier: 4.4.3
-        version: 4.4.3
+        specifier: 4.5.4
+        version: 4.5.4
     devDependencies:
       '@modelcontextprotocol/client':
         specifier: 2.0.0
@@ -98,8 +98,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/sdk
       zod:
-        specifier: 4.4.3
-        version: 4.4.3
+        specifier: 4.5.4
+        version: 4.5.4
     devDependencies:
       '@modelcontextprotocol/client':
         specifier: 2.0.0
@@ -114,14 +114,14 @@ importers:
         specifier: workspace:^
         version: link:../registry
       zod:
-        specifier: 4.4.3
-        version: 4.4.3
+        specifier: 4.5.4
+        version: 4.5.4
 
   packages/core:
     dependencies:
       zod:
-        specifier: 4.4.3
-        version: 4.4.3
+        specifier: 4.5.4
+        version: 4.5.4
 
   packages/registry:
     dependencies:
@@ -129,8 +129,8 @@ importers:
         specifier: workspace:^
         version: link:../core
       zod:
-        specifier: 4.4.3
-        version: 4.4.3
+        specifier: 4.5.4
+        version: 4.5.4
     devDependencies:
       '@boolink-dev/cloudflare':
         specifier: workspace:^
@@ -148,8 +148,8 @@ importers:
         specifier: 2.0.0
         version: 2.0.0
       zod:
-        specifier: 4.4.3
-        version: 4.4.3
+        specifier: 4.5.4
+        version: 4.5.4
     devDependencies:
       '@modelcontextprotocol/client':
         specifier: 2.0.0
@@ -1828,6 +1828,9 @@ packages:
   zod@4.4.3:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
+  zod@4.5.4:
+    resolution: {integrity: sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA==}
+
 snapshots:
 
   '@anthropic-ai/mcpb@2.1.2(supports-color@10.2.2)':
@@ -2305,12 +2308,12 @@ snapshots:
 
   '@modelcontextprotocol/core@2.0.0':
     dependencies:
-      zod: 4.4.3
+      zod: 4.5.4
 
   '@modelcontextprotocol/server@2.0.0':
     dependencies:
       '@modelcontextprotocol/core': 2.0.0
-      zod: 4.4.3
+      zod: 4.5.4
 
   '@oxc-project/types@0.143.0': {}
 
@@ -3257,3 +3260,5 @@ snapshots:
   zod@3.25.76: {}
 
   zod@4.4.3: {}
+
+  zod@4.5.4: {}
